@@ -1,6 +1,6 @@
 # SafeBite
 
-SafeBite is a responsive web application for University of Cincinnati students to find dining halls, explore menus, evaluate food against allergies and dietary restrictions, compare crowd levels and wait times, save favorites, report inaccurate information, and—where feasible—pre-order or schedule pickup. A separate web-based staff admin interface supports dining operations.
+SafeBite is a responsive web application for University of Cincinnati students to find dining halls, explore menus, evaluate food against allergies and dietary restrictions, compare crowd levels and wait times, save favorites, report inaccurate information, and-where feasible-pre-order or schedule pickup. A separate web-based staff admin interface supports dining operations.
 
 ## Project plan
 
@@ -39,3 +39,12 @@ The implementation is a responsive web application with a web-based staff admin 
 ## Risks and constraints
 
 Key risks include availability and quality of UC dining/menu/nutrition data, dietary-safety accuracy, occupancy/wait-time data feasibility, pre-order feasibility, privacy/security, accessibility, schedule constraints, and cross-browser responsiveness.
+
+## GitHub owner mapping
+
+- Gray: [AGray551](https://github.com/AGray551)
+- Conner: [Connermatthewking](https://github.com/Connermatthewking)
+- Colson: [22fishc](https://github.com/22fishc)
+- Silas: [sil6s](https://github.com/sil6s)
+
+Tickets assigned to a named contributor use this mapping; Team-only tickets remain unassigned.
