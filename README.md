@@ -12,6 +12,14 @@ SafeBite is a responsive web application for University of Cincinnati students t
 
 The MVP provides dining-hall discovery, menus and dietary safety information, dietary profiles, favorites, crowd/wait-time comparison, information reporting, responsive accessibility, and a web-based dining-staff administration interface. Pre-order and scheduled pickup are identified as stretch work, subject to feasibility.
 
+### Measurable objectives
+
+1. Provide a responsive student web experience for dining-hall discovery, menu viewing, dietary-profile management, favorites, crowd and wait-time comparison, and inaccurate-information reporting.
+2. Evaluate every menu item shown in the demonstration dataset against a student's saved allergies and dietary restrictions, with a clearly visible safety result.
+3. Support an end-to-end demonstration of the core student journey: update a dietary profile, find a dining hall, assess menu items, save a favorite, and submit an information report.
+4. Support a web-based dining-staff workflow for reviewing reports and managing demonstration menu and occupancy data.
+5. Complete accessibility, responsive, and end-to-end test passes before final delivery, resolving critical issues found during testing.
+
 Out of scope: delivery drivers, tipping, restaurant ratings or reviews, social feeds, credit-card checkout, full POS functionality, and advanced AI recommendation systems.
 
 ## Project management and communication
@@ -34,7 +42,11 @@ Roles and ownership are recorded per issue. Student-facing web, backend/data, UX
 
 ## Tools and technology
 
-The implementation is a responsive web application with a web-based staff admin interface. Final technology choices, hosting, authentication, database, testing tooling, and design tooling are documented in the planning issues.
+- GitHub repository, Issues, Projects, milestones, and iterations for source control and project management.
+- Markdown documentation in the repository for the project plan and technical decisions.
+- Figma for UX and prototype work, as tracked in the planning issues.
+- A responsive web application and web-based staff admin interface for implementation and demonstration.
+- The final frontend, backend, database, authentication, hosting, and testing stack will be selected and documented in the technology-stack planning issue before implementation begins.
 
 ## Risks and constraints
 
