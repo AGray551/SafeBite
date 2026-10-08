@@ -70,6 +70,10 @@ const routes: RouteObject[] = [
                 lazy: page(() => import('@/features/dining/HallDetailPage'), 'HallDetailPage'),
               },
               {
+                path: 'favorites',
+                lazy: page(() => import('@/features/favorites/FavoritesPage'), 'FavoritesPage'),
+              },
+              {
                 path: 'search',
                 lazy: page(() => import('@/features/search/SearchPage'), 'SearchPage'),
               },
