@@ -67,10 +67,26 @@ The MVP covers finding dining halls, viewing scraped menus with dietary safety i
 
 ### Wireframe changes
 
-- [ ] Move the 5 order screens to a "Later" section
-- [ ] Replace the **Orders** tab in the bottom navigation with **Search** or **Favorites**
-- [ ] Remove crowd and wait-time information, or label it as a placeholder
-- [ ] Add "Last updated" times to menu and item screens
+- [x] Move the 5 order screens to a "Later" section
+- [x] Replace the **Orders** tab in the bottom navigation with **Search** or **Favorites**
+- [x] Remove crowd and wait-time information, or label it as a placeholder
+- [x] Add "Last updated" times to menu and item screens
+
+## Repository layout
+
+| Folder | Contents |
+| --- | --- |
+| [`web/`](web/) | Student web app (React + TypeScript + Vite). Runs on a built-in mock API until the backend is ready. See [web/README.md](web/README.md) for setup, architecture and the proposed API contract. |
+
+The backend API and the menu scraper will live alongside it (for example in `api/` and `scraper/`).
+
+To run the web app locally:
+
+```bash
+cd web
+npm install
+npm run dev
+```
 
 ## Project management and communication
 
@@ -95,7 +111,7 @@ Roles and ownership are recorded per issue. Student-facing web, backend/data (in
 - GitHub repository, Issues, Projects, milestones, and iterations for source control and project management.
 - Markdown documentation in the repository for the project plan and technical decisions.
 - Figma for UX and prototype work, as tracked in the planning issues.
-- A responsive web application for implementation and demonstration.
+- A responsive web application for implementation and demonstration: React, TypeScript, Vite, Tailwind CSS and TanStack Query (see [web/README.md](web/README.md)).
 - A scheduled scraper that collects and normalizes UC Dining menu, ingredient, allergen, and nutrition data.
 - The final frontend, backend, database, authentication, hosting, scraping, and testing stack will be selected and documented in the technology-stack planning issue before implementation begins.
 
