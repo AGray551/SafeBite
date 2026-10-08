@@ -20,6 +20,9 @@ const routes: RouteObject[] = [
   {
     errorElement: <RouteErrorPage />,
     children: [
+      { path: 'welcome', lazy: page(() => import('@/features/auth/WelcomePage'), 'WelcomePage') },
+      { path: 'sign-in', lazy: page(() => import('@/features/auth/SignInPage'), 'SignInPage') },
+
       // Everything below requires being signed in or in guest mode.
       {
         element: <RequireEntry />,
