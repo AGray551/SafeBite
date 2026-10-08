@@ -70,6 +70,10 @@ const routes: RouteObject[] = [
                 lazy: page(() => import('@/features/dining/HallDetailPage'), 'HallDetailPage'),
               },
               {
+                path: 'search',
+                lazy: page(() => import('@/features/search/SearchPage'), 'SearchPage'),
+              },
+              {
                 path: 'items/:itemId',
                 // Item detail has its own bottom action bar instead of the tabs.
                 handle: { hideNav: true } satisfies RouteHandle,
