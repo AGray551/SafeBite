@@ -32,7 +32,10 @@ function makeProfile(overrides: Partial<DietaryProfile> = {}): DietaryProfile {
 
 describe('assessItem', () => {
   it('marks an item with no conflicts as safe', () => {
-    const result = assessItem(makeItem({ allergens: { contains: ['soy'], mayContain: [] } }), makeProfile());
+    const result = assessItem(
+      makeItem({ allergens: { contains: ['soy'], mayContain: [] } }),
+      makeProfile(),
+    );
     expect(result.status).toBe('safe');
     expect(result.summary).toBe('No conflicts found');
   });
@@ -56,7 +59,10 @@ describe('assessItem', () => {
   });
 
   it('marks an intolerance as caution, not avoid', () => {
-    const result = assessItem(makeItem({ allergens: { contains: ['milk'], mayContain: [] } }), makeProfile());
+    const result = assessItem(
+      makeItem({ allergens: { contains: ['milk'], mayContain: [] } }),
+      makeProfile(),
+    );
     expect(result.status).toBe('caution');
     expect(result.summary).toBe('Contains milk (intolerance)');
   });
@@ -71,7 +77,10 @@ describe('assessItem', () => {
 
   it('never flags a preference as unsafe', () => {
     const profile = makeProfile({ avoid: [{ allergen: 'eggs', severity: 'preference' }] });
-    const result = assessItem(makeItem({ allergens: { contains: ['eggs'], mayContain: [] } }), profile);
+    const result = assessItem(
+      makeItem({ allergens: { contains: ['eggs'], mayContain: [] } }),
+      profile,
+    );
     expect(result.status).toBe('safe');
     expect(isSafeForMe(result)).toBe(false);
   });
@@ -102,8 +111,14 @@ describe('assessItem', () => {
 describe('isSafeForMe', () => {
   it('keeps caution items but hides avoid items', () => {
     const profile = makeProfile();
-    const caution = assessItem(makeItem({ allergens: { contains: ['milk'], mayContain: [] } }), profile);
-    const avoid = assessItem(makeItem({ allergens: { contains: ['peanuts'], mayContain: [] } }), profile);
+    const caution = assessItem(
+      makeItem({ allergens: { contains: ['milk'], mayContain: [] } }),
+      profile,
+    );
+    const avoid = assessItem(
+      makeItem({ allergens: { contains: ['peanuts'], mayContain: [] } }),
+      profile,
+    );
     expect(isSafeForMe(caution)).toBe(true);
     expect(isSafeForMe(avoid)).toBe(false);
   });

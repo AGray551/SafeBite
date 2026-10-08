@@ -77,7 +77,9 @@ export function findConflicts(item: MenuItem, profile: DietaryProfile): Conflict
 
 function summarize(status: SafetyStatus, conflicts: Conflict[]): string {
   const flagged = conflicts.filter((c) => c.severity !== 'preference');
-  const contains = flagged.filter((c) => c.kind === 'contains').map((c) => allergenNoun(c.allergen));
+  const contains = flagged
+    .filter((c) => c.kind === 'contains')
+    .map((c) => allergenNoun(c.allergen));
   const mayContain = flagged
     .filter((c) => c.kind === 'may-contain')
     .map((c) => allergenNoun(c.allergen));
@@ -111,7 +113,12 @@ export function assessItem(item: MenuItem, profile: DietaryProfile | null): Safe
   const unmetPreferences = profile.preferences.filter((tag) => !item.dietaryTags.includes(tag));
 
   if (!item.allergens) {
-    return { status: 'unknown', summary: 'Allergen info unavailable', conflicts: [], unmetPreferences };
+    return {
+      status: 'unknown',
+      summary: 'Allergen info unavailable',
+      conflicts: [],
+      unmetPreferences,
+    };
   }
 
   const conflicts = findConflicts(item, profile);
