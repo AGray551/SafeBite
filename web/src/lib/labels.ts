@@ -42,6 +42,17 @@ export const DIETARY_TAG_LABELS: Record<DietaryTag, string> = {
   'high-protein': 'High protein',
 };
 
+/** Short codes for compact badges on cards (full label stays available to screen readers). */
+export const DIETARY_TAG_SHORT_LABELS: Record<DietaryTag, string> = {
+  vegetarian: 'V',
+  vegan: 'VG',
+  'gluten-free': 'GF',
+  'dairy-free': 'DF',
+  halal: 'Halal',
+  kosher: 'Kosher',
+  'high-protein': 'HP',
+};
+
 export const MEAL_PERIOD_LABELS: Record<MealPeriod, string> = {
   breakfast: 'Breakfast',
   lunch: 'Lunch',

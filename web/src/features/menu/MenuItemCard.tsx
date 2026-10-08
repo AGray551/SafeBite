@@ -52,7 +52,7 @@ export function MenuItemCard({
       )}
 
       <div className="flex gap-3 py-3 pr-2 pl-3.5">
-        <ImagePlaceholder className="size-18" />
+        <ImagePlaceholder className="size-14" />
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           {/* Stretched link: the whole card is clickable, the heart stays separate. */}
           <Link
@@ -63,7 +63,7 @@ export function MenuItemCard({
           </Link>
           <div className="text-sm text-ink-3">{meta}</div>
           {item.dietaryTags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1">
               {item.dietaryTags.map((tag) => (
                 <DietaryBadge key={tag} tag={tag} />
               ))}

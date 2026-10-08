@@ -191,7 +191,7 @@ function ProfileSummary({ profile }: { profile: DietaryProfile }) {
         {profile.preferences.length || profile.otherPreference ? (
           <div className="flex flex-wrap gap-2">
             {profile.preferences.map((tag) => (
-              <DietaryBadge key={tag} tag={tag} />
+              <DietaryBadge key={tag} tag={tag} variant="full" />
             ))}
             {profile.otherPreference && (
               <span className="text-sm text-ink-2">{profile.otherPreference}</span>
