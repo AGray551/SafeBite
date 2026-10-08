@@ -6,6 +6,9 @@ import { useSafety } from '@/features/safety/useSafety';
 import { currentMealPeriod, toDateKey } from '@/lib/time';
 import type { HallMenuSummary } from './HallCard';
 
+// Stable fallback so consumers' memo dependencies don't change every render.
+const NO_MENUS: Menu[] = [];
+
 /**
  * Today's menus for the current meal period, plus a per-hall summary of how
  * many items there are and how many are safe for this student.
@@ -26,5 +29,5 @@ export function useHallSummaries(mealPeriod: MealPeriod = currentMealPeriod()) {
     return byHall;
   }, [menusQuery.data, mealPeriod, profile, assess]);
 
-  return { menus: menusQuery.data ?? ([] as Menu[]), summaries, menusQuery };
+  return { menus: menusQuery.data ?? NO_MENUS, summaries, menusQuery };
 }
