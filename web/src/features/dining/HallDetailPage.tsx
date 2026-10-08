@@ -86,9 +86,8 @@ function HallMenu({ hall }: { hall: DiningHall }) {
 
   const sections = groupByCategory(visible);
 
-  const directionsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    hall.address ?? `${hall.name}, University of Cincinnati`,
-  )}`;
+  // Use coordinates so directions land on the right building, not just the street.
+  const directionsUrl = `https://www.google.com/maps/search/?api=1&query=${hall.coordinates.lat},${hall.coordinates.lng}`;
 
   return (
     <Page>
@@ -112,8 +111,12 @@ function HallMenu({ hall }: { hall: DiningHall }) {
               <Clock aria-hidden size={16} /> Today {formatHours(hall.todayHours)}
             </li>
           )}
-          <li className="flex items-center gap-1.5">
-            <MapPin aria-hidden size={16} /> {hall.location}
+          <li className="flex items-start gap-1.5">
+            <MapPin aria-hidden size={16} className="mt-0.5 shrink-0" />
+            <span>
+              {hall.location}
+              {hall.address && <span className="block text-sm text-ink-3">{hall.address}</span>}
+            </span>
           </li>
         </ul>
         <a

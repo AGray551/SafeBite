@@ -16,30 +16,31 @@ npm run dev
 
 Open http://localhost:5173. To try the full flow, choose **Get Started**, create an account (any email works against the mock API), and set up a dietary profile.
 
-| Script | What it does |
-| --- | --- |
-| `npm run dev` | Start the dev server with hot reload |
-| `npm run build` | Typecheck and build for production into `dist/` |
-| `npm run preview` | Serve the production build locally |
-| `npm run lint` | ESLint (including accessibility rules) |
-| `npm run format` / `format:check` | Prettier (with Tailwind class sorting) |
-| `npm run typecheck` | TypeScript only |
-| `npm test` / `test:run` | Vitest in watch mode / once |
+| Script                            | What it does                                    |
+| --------------------------------- | ----------------------------------------------- |
+| `npm run dev`                     | Start the dev server with hot reload            |
+| `npm run build`                   | Typecheck and build for production into `dist/` |
+| `npm run preview`                 | Serve the production build locally              |
+| `npm run lint`                    | ESLint (including accessibility rules)          |
+| `npm run format` / `format:check` | Prettier (with Tailwind class sorting)          |
+| `npm run typecheck`               | TypeScript only                                 |
+| `npm test` / `test:run`           | Vitest in watch mode / once                     |
 
 CI (`.github/workflows/web.yml`) runs lint, format check, typecheck, tests and build on every PR that touches `web/`.
 
 ## Tech stack and why
 
-| Concern | Choice | Why |
-| --- | --- | --- |
-| Build tool | **Vite** | Fast dev server, simple config, static output that can be hosted anywhere. We don't need server rendering since the backend will be a separate API. |
-| UI | **React 19 + TypeScript (strict)** | The team knows React; strict types catch data-shape bugs early. |
-| Routing | **React Router 7** | Standard for SPAs; every page is lazy-loaded into its own chunk. |
-| Server data | **TanStack Query** | Caching, loading/error states and refetching for API data; optimistic updates for favorites. |
-| Validation / API contract | **zod** | Domain types are inferred from schemas, and API responses are validated against them. |
-| Styling | **Tailwind CSS v4** | Design tokens from the wireframes live in one CSS file as variables. |
-| Icons | **lucide-react** | Consistent, tree-shakeable icon set. |
-| Tests | **Vitest + Testing Library** | Same config as Vite, fast, and tests behaviour the way users see it. |
+| Concern                   | Choice                             | Why                                                                                                                                                 |
+| ------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Build tool                | **Vite**                           | Fast dev server, simple config, static output that can be hosted anywhere. We don't need server rendering since the backend will be a separate API. |
+| UI                        | **React 19 + TypeScript (strict)** | The team knows React; strict types catch data-shape bugs early.                                                                                     |
+| Routing                   | **React Router 7**                 | Standard for SPAs; every page is lazy-loaded into its own chunk.                                                                                    |
+| Server data               | **TanStack Query**                 | Caching, loading/error states and refetching for API data; optimistic updates for favorites.                                                        |
+| Validation / API contract | **zod**                            | Domain types are inferred from schemas, and API responses are validated against them.                                                               |
+| Styling                   | **Tailwind CSS v4**                | Design tokens from the wireframes live in one CSS file as variables.                                                                                |
+| Icons                     | **lucide-react**                   | Consistent, tree-shakeable icon set.                                                                                                                |
+| Map                       | **Leaflet + react-leaflet**        | Free OpenStreetMap tiles, no API key needed.                                                                                                        |
+| Tests                     | **Vitest + Testing Library**       | Same config as Vite, fast, and tests behaviour the way users see it.                                                                                |
 
 ## Project structure
 
@@ -80,25 +81,25 @@ Conventions:
 
 All responses are JSON and must match the schemas in `src/api/schemas.ts`. Authenticated requests send `Authorization: Bearer <token>`.
 
-| Method | Path | Returns |
-| --- | --- | --- |
-| POST | `/auth/sign-in` | `Session` (body: `email`, `password`) |
-| POST | `/auth/sign-up` | `Session` (body: `name`, `email`, `password`) |
-| POST | `/auth/sign-out` | 204 |
-| GET | `/halls` | `DiningHall[]` |
-| GET | `/halls/:hallId` | `DiningHall` |
-| GET | `/menus?date=YYYY-MM-DD&mealPeriod=lunch` | `Menu[]` (one per location) |
-| GET | `/halls/:hallId/menu?date=&mealPeriod=` | `Menu` |
-| GET | `/items/:itemId` | `MenuItem` |
-| GET | `/items?ids=a,b,c` | `MenuItem[]` |
-| GET | `/items/search?q=&date=&mealPeriod=&hallId=` | `MenuItem[]` |
-| GET / PUT / DELETE | `/me/profile` | `DietaryProfile \| null` / `DietaryProfile` / 204 |
-| GET | `/me/favorites` | `Favorites` |
-| PUT / DELETE | `/me/favorites/items/:itemId` | `Favorites` |
-| PUT / DELETE | `/me/favorites/halls/:hallId` | `Favorites` |
-| GET | `/me/alerts` | `SafetyAlert[]` |
-| POST | `/me/alerts/:alertId/read` | `SafetyAlert` |
-| POST | `/reports` | `Report` (body: `NewReport`) |
+| Method             | Path                                         | Returns                                           |
+| ------------------ | -------------------------------------------- | ------------------------------------------------- |
+| POST               | `/auth/sign-in`                              | `Session` (body: `email`, `password`)             |
+| POST               | `/auth/sign-up`                              | `Session` (body: `name`, `email`, `password`)     |
+| POST               | `/auth/sign-out`                             | 204                                               |
+| GET                | `/halls`                                     | `DiningHall[]`                                    |
+| GET                | `/halls/:hallId`                             | `DiningHall`                                      |
+| GET                | `/menus?date=YYYY-MM-DD&mealPeriod=lunch`    | `Menu[]` (one per location)                       |
+| GET                | `/halls/:hallId/menu?date=&mealPeriod=`      | `Menu`                                            |
+| GET                | `/items/:itemId`                             | `MenuItem`                                        |
+| GET                | `/items?ids=a,b,c`                           | `MenuItem[]`                                      |
+| GET                | `/items/search?q=&date=&mealPeriod=&hallId=` | `MenuItem[]`                                      |
+| GET / PUT / DELETE | `/me/profile`                                | `DietaryProfile \| null` / `DietaryProfile` / 204 |
+| GET                | `/me/favorites`                              | `Favorites`                                       |
+| PUT / DELETE       | `/me/favorites/items/:itemId`                | `Favorites`                                       |
+| PUT / DELETE       | `/me/favorites/halls/:hallId`                | `Favorites`                                       |
+| GET                | `/me/alerts`                                 | `SafetyAlert[]`                                   |
+| POST               | `/me/alerts/:alertId/read`                   | `SafetyAlert`                                     |
+| POST               | `/reports`                                   | `Report` (body: `NewReport`)                      |
 
 Notes for the backend/scraper:
 
@@ -109,18 +110,18 @@ Notes for the backend/scraper:
 
 ## Safety rules
 
-| Profile setting | Item contains it | Item may contain it |
-| --- | --- | --- |
-| Allergy | **Avoid** | Caution |
-| Intolerance | Caution | Caution |
-| Preference | not flagged (hidden by Safe for Me) | not flagged |
+| Profile setting | Item contains it                    | Item may contain it |
+| --------------- | ----------------------------------- | ------------------- |
+| Allergy         | **Avoid**                           | Caution             |
+| Intolerance     | Caution                             | Caution             |
+| Preference      | not flagged (hidden by Safe for Me) | not flagged         |
 
 Status is always shown with an icon, a word **and** a border style (solid, dashed, filled, dotted), never color alone. "Safe for Me" hides items marked Avoid or that don't meet the student's dietary preferences, and screens always say how many items were hidden.
 
 ## What's placeholder for now
 
-- **Sample data:** dishes, hours and building names in `mock/fixtures.ts` are for demo only and need to be replaced by scraped data.
-- **Map:** the map view is a placeholder grid; swap in MapLibre/Leaflet once locations have coordinates.
+- **Sample data:** dishes and hours in `mock/fixtures.ts` are for demo only and need to be replaced by scraped data. Addresses are real; coordinates were looked up from OpenStreetMap.
+- **Map tiles:** the map uses Leaflet with the public OpenStreetMap tile server, which is fine for development and demos. For a public launch, switch `TILE_URL` in `features/dining/CampusMap.tsx` to a tile provider with a usage plan (OpenStreetMap's tile policy doesn't allow heavy production traffic).
 - **Photos:** food images are placeholders until the scraper collects them.
 - **Password reset** isn't wired up (needs backend support).
 - **Notification toggles** are saved per device; delivering notifications needs the backend.

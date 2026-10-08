@@ -86,11 +86,8 @@ export const diningHallSchema = z.object({
   /** Today's hours, or null when the hall is closed all day. */
   todayHours: hoursSchema.nullable(),
   mealPeriods: z.array(mealPeriodSchema),
-  /**
-   * Position on the campus map placeholder, as percentages of its width and
-   * height. Will become lat/lng once a real map is wired up.
-   */
-  mapPosition: z.object({ x: z.number(), y: z.number() }),
+  /** Building location for the map (WGS84). */
+  coordinates: z.object({ lat: z.number(), lng: z.number() }),
 });
 export type DiningHall = z.infer<typeof diningHallSchema>;
 

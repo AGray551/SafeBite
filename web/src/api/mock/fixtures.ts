@@ -9,11 +9,50 @@
 import type { DiningHall, MealPeriod, MenuItem } from '../schemas';
 
 /**
- * NOTE: building names and hours below are placeholders for the demo. The
- * scraper should replace them with UC Dining's published data, so verify
- * them before treating any of this as accurate.
+ * Addresses come from UC's published location list. Coordinates were looked
+ * up from OpenStreetMap; locations in the same building share a point and
+ * are grouped into one marker on the map. Hours are still sample values.
  */
-const TUC = 'Tangeman University Center';
+const BUILDINGS = {
+  crc: {
+    address: '2820 Bearcat Way, Cincinnati, OH 45221',
+    coordinates: { lat: 39.13221, lng: -84.51491 },
+  },
+  siddall: {
+    address: '2603 Scioto Lane, Cincinnati, OH 45219',
+    coordinates: { lat: 39.13427, lng: -84.51175 },
+  },
+  marianSpencer: {
+    address: '2911 Scioto Lane, Cincinnati, OH 45219',
+    coordinates: { lat: 39.13362, lng: -84.51218 },
+  },
+  tuc: {
+    address: '2766 UC MainStreet, Cincinnati, OH 45221',
+    coordinates: { lat: 39.13152, lng: -84.51739 },
+  },
+  steger: {
+    address: '2801 UC MainStreet, Cincinnati, OH 45221',
+    coordinates: { lat: 39.13238, lng: -84.51622 },
+  },
+  aronoff: {
+    address: '2624 Clifton Ave, Cincinnati, OH 45221',
+    coordinates: { lat: 39.13453, lng: -84.51867 },
+  },
+  lindner: {
+    address: '2906 Woodside Drive, Cincinnati, OH 45221',
+    coordinates: { lat: 39.13382, lng: -84.51445 },
+  },
+  careCrawley: {
+    address: '231 Albert Sabin Way, Cincinnati, OH 45267',
+    coordinates: { lat: 39.13957, lng: -84.50418 },
+  },
+  universityHall: {
+    address: '51 Goodman Drive, Cincinnati, OH 45221',
+    coordinates: { lat: 39.13662, lng: -84.50847 },
+  },
+} satisfies Record<string, Pick<DiningHall, 'address' | 'coordinates'>>;
+
+type Building = keyof typeof BUILDINGS;
 
 /** Shorthand for building hall fixtures. */
 function hall(
@@ -21,9 +60,9 @@ function hall(
   name: string,
   kind: DiningHall['kind'],
   location: string,
+  building: Building,
   hours: [string, string] | null,
   mealPeriods: MealPeriod[],
-  mapPosition: { x: number; y: number },
   concepts?: string[],
 ): DiningHall {
   return {
@@ -31,9 +70,9 @@ function hall(
     name,
     kind,
     location,
+    ...BUILDINGS[building],
     todayHours: hours ? { opensAt: hours[0], closesAt: hours[1] } : null,
     mealPeriods,
-    mapPosition,
     ...(concepts && { concepts }),
   };
 }
@@ -43,94 +82,140 @@ const LUNCH_DINNER: MealPeriod[] = ['lunch', 'dinner'];
 const DAYTIME: MealPeriod[] = ['breakfast', 'lunch'];
 
 export const HALLS: DiningHall[] = [
-  // All-you-care-to-eat dining halls
-  hall('centercourt', 'CenterCourt', 'dining-hall', 'Center Village', ['07:00', '20:00'], ALL, {
-    x: 46,
-    y: 58,
-  }),
-  hall('marketpointe', 'MarketPointe', 'dining-hall', 'Siddall Hall', ['07:00', '21:00'], ALL, {
-    x: 18,
-    y: 26,
-  }),
+  // Residential dining centers (all-you-care-to-eat)
+  hall(
+    'centercourt',
+    'CenterCourt',
+    'dining-hall',
+    'Campus Recreation Center (CRC)',
+    'crc',
+    ['07:00', '20:00'],
+    ALL,
+  ),
+  hall(
+    'marketpointe',
+    'MarketPointe',
+    'dining-hall',
+    'Siddall Hall',
+    'siddall',
+    ['07:00', '21:00'],
+    ALL,
+  ),
   hall(
     'on-the-green',
     'On the Green (OTG)',
     'dining-hall',
-    'Campus Green',
+    'Marian Spencer Hall',
+    'marianSpencer',
     ['07:30', '19:30'],
     ALL,
-    { x: 70, y: 20 },
   ),
 
-  // Restaurants
-  hall('chick-fil-a', 'Chick-fil-A', 'restaurant', TUC, ['10:30', '20:00'], LUNCH_DINNER, {
-    x: 38,
-    y: 40,
-  }),
-  hall('pei-wei', 'Pei Wei', 'restaurant', TUC, ['10:30', '20:00'], LUNCH_DINNER, { x: 30, y: 46 }),
-  hall('halal-shack', 'Halal Shack', 'restaurant', TUC, ['11:00', '21:00'], LUNCH_DINNER, {
-    x: 42,
-    y: 34,
-  }),
-  hall('cincy-grill', 'Cincy Grill', 'restaurant', TUC, ['11:00', '21:00'], LUNCH_DINNER, {
-    x: 34,
-    y: 30,
-  }),
-  hall('subway', 'Subway', 'restaurant', TUC, ['10:00', '22:00'], LUNCH_DINNER, { x: 26, y: 36 }),
+  // TUC food court & MainStreet
+  hall(
+    'chick-fil-a',
+    'Chick-fil-A',
+    'restaurant',
+    'TUC, Level 2',
+    'tuc',
+    ['10:30', '20:00'],
+    LUNCH_DINNER,
+  ),
+  hall('pei-wei', 'Pei Wei', 'restaurant', 'TUC, Level 2', 'tuc', ['10:30', '20:00'], LUNCH_DINNER),
+  hall(
+    'halal-shack',
+    'Halal Shack',
+    'restaurant',
+    'TUC, Level 2',
+    'tuc',
+    ['11:00', '21:00'],
+    LUNCH_DINNER,
+  ),
+  hall(
+    'cincy-grill',
+    'Cincy Grill',
+    'restaurant',
+    'TUC, Level 2',
+    'tuc',
+    ['11:00', '21:00'],
+    LUNCH_DINNER,
+  ),
   hall(
     'bearcats-social',
     'Bearcats Social / Bearcats Cafe',
     'restaurant',
-    'Main campus',
+    'TUC, Level 3',
+    'tuc',
     ['08:00', '21:00'],
     ALL,
-    { x: 58, y: 44 },
     ['Bowl Lab', 'Ibasho Sushi', 'BABB Breakfast Burritos'],
   ),
+  hall(
+    'mainstreet-expressmart',
+    'MainStreet ExpressMart',
+    'market',
+    'TUC, Level 3',
+    'tuc',
+    ['08:00', '23:00'],
+    ALL,
+  ),
+  hall(
+    'subway',
+    'Subway',
+    'restaurant',
+    'Steger Student Life Center',
+    'steger',
+    ['10:00', '22:00'],
+    LUNCH_DINNER,
+  ),
 
-  // Cafés
-  hall('daap-cafe', 'DAAP Café', 'cafe', 'DAAP', ['08:00', '15:00'], DAYTIME, { x: 14, y: 62 }),
+  // Academic building cafés & coffee
+  hall(
+    'daap-cafe',
+    'DAAP Café',
+    'cafe',
+    'Aronoff Center, Level 4',
+    'aronoff',
+    ['08:00', '15:00'],
+    DAYTIME,
+  ),
   hall(
     'stadium-view-cafe',
     'Stadium View Café',
     'cafe',
-    'Near Nippert Stadium',
+    'Campus Recreation Center (CRC)',
+    'crc',
     ['17:00', '23:00'],
     ['dinner'],
-    { x: 62, y: 78 },
   ),
-  hall('campus-view-cafe', 'Campus View Café', 'cafe', 'Main campus', ['08:00', '18:00'], ALL, {
-    x: 80,
-    y: 52,
-  }),
-  hall('shake-smart', 'Shake Smart', 'cafe', 'Campus Recreation Center', ['07:00', '19:00'], ALL, {
-    x: 54,
-    y: 68,
-  }),
+  hall('shake-smart', 'Shake Smart', 'cafe', 'CRC entrance', 'crc', ['07:00', '19:00'], ALL),
   hall(
     'starbucks-lindner',
     'Starbucks (Lindner College of Business)',
     'cafe',
-    'Lindner Hall',
+    'Carl H. Lindner Hall',
+    'lindner',
     ['07:30', '17:00'],
     DAYTIME,
-    { x: 84, y: 30 },
   ),
   hall(
     'starbucks-msb',
     'Starbucks (Medical Science Building)',
     'cafe',
-    'Medical Sciences Building',
+    'Care/Crawley Pavilion',
+    'careCrawley',
     ['07:00', '16:00'],
     DAYTIME,
-    { x: 88, y: 84 },
   ),
-
-  // Convenience
-  hall('mainstreet-expressmart', 'MainStreet ExpressMart', 'market', TUC, ['08:00', '23:00'], ALL, {
-    x: 36,
-    y: 50,
-  }),
+  hall(
+    'campus-view-cafe',
+    'Campus View Café',
+    'cafe',
+    'University Hall, Level 4',
+    'universityHall',
+    ['08:00', '18:00'],
+    ALL,
+  ),
 ];
 
 /** Locations whose sample menu was last scraped long ago (to demo the warning). */
