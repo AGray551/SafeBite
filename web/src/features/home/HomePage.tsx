@@ -30,7 +30,7 @@ export function HomePage() {
   const mealPeriod = currentMealPeriod();
   const hallsQuery = useHalls();
   const { menus, summaries, menusQuery } = useHallSummaries(mealPeriod);
-  const { profile, assess } = useSafety();
+  const { profile, assess, isLoading: profileLoading } = useSafety();
   const [safeOnly, setSafeOnly] = useState(true);
   const [filters, setFilters] = useState<ReadonlySet<QuickFilter>>(new Set());
 
@@ -78,7 +78,8 @@ export function HomePage() {
       />
 
       <Page>
-        <ProfileSummary summary={describeProfile(profile)} />
+        {/* Wait for the profile so we don't flash the setup prompt. */}
+        {!profileLoading && <ProfileSummary summary={describeProfile(profile)} />}
         <AlertBanner />
 
         <ChipRow label="Quick filters">
@@ -115,7 +116,7 @@ export function HomePage() {
             <section aria-labelledby="halls-heading" className="flex flex-col gap-3">
               <SectionHeader
                 id="halls-heading"
-                title="Dining halls"
+                title="Places to eat"
                 action={{ label: 'See all', to: '/dining' }}
               />
               {bestBet && (
