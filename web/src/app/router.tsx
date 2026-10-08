@@ -50,6 +50,10 @@ const routes: RouteObject[] = [
             ],
           },
           {
+            path: 'alerts/:alertId',
+            lazy: page(() => import('@/features/alerts/SafetyAlertPage'), 'SafetyAlertPage'),
+          },
+          {
             path: 'items/:itemId/report',
             lazy: page(() => import('@/features/menu/ReportPage'), 'ReportPage'),
           },
@@ -68,6 +72,10 @@ const routes: RouteObject[] = [
               {
                 path: 'dining/:hallId',
                 lazy: page(() => import('@/features/dining/HallDetailPage'), 'HallDetailPage'),
+              },
+              {
+                path: 'alerts',
+                lazy: page(() => import('@/features/alerts/AlertsPage'), 'AlertsPage'),
               },
               {
                 path: 'favorites',
