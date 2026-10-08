@@ -1,0 +1,142 @@
+@import 'tailwindcss';
+
+/*
+ * SafeBite design tokens.
+ *
+ * Values come straight from the v1 wireframe component sheet. Every token is
+ * a CSS variable, so the accessibility settings further down can override
+ * them at runtime (high contrast, larger text) without touching components.
+ *
+ * Font sizes are in rem so "Larger text" scales the whole UI.
+ */
+@theme {
+  --font-sans: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Surfaces */
+  --color-canvas: #f4f4f1;
+  --color-surface: #ffffff;
+  --color-surface-muted: #fafaf8;
+  --color-placeholder: #e8e9eb;
+
+  /* Text, darkest to lightest */
+  --color-ink: #1a1d21;
+  --color-ink-2: #40464f;
+  --color-ink-3: #5a616b;
+  --color-ink-4: #9aa0a8;
+
+  /* Borders */
+  --color-line: #d5d8dd;
+  --color-line-strong: #9aa0a8;
+  --color-line-input: #7d848d;
+  --color-line-dashed: #b3b8bf;
+
+  /* Brand (UC-inspired navy) */
+  --color-brand: #1b3a5c;
+  --color-brand-hover: #10263d;
+  --color-brand-tint: #e2e9f1;
+
+  /* Safety statuses. Never used alone: always paired with an icon + label. */
+  --color-safe: #1b5e32;
+  --color-safe-tint: #e0efe4;
+  --color-caution: #a86b00;
+  --color-caution-ink: #6e4300;
+  --color-caution-tint: #fff0cc;
+  --color-avoid: #9b1c24;
+
+  /* Type scale (rem-based so it respects "Larger text") */
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-caption: 0.8125rem; /* 13px */
+  --text-label: 0.9375rem; /* 15px */
+  --text-title: 1.625rem; /* 26px */
+
+  --radius-card: 14px;
+  --radius-control: 12px;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.4;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    margin: 0;
+  }
+
+  a {
+    color: var(--color-brand);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-brand-hover);
+  }
+
+  /* A visible, consistent focus ring for keyboard users. */
+  :focus-visible {
+    outline: 3px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  summary {
+    cursor: pointer;
+  }
+}
+
+/* ---------- Accessibility settings (toggled from Profile) ---------- */
+
+/* Larger text: bump the root size so every rem-based value scales. */
+html[data-text-size='large'] {
+  font-size: 112.5%;
+}
+
+/* High contrast: darken secondary text and borders. */
+html[data-contrast='high'] {
+  --color-ink-2: #1a1d21;
+  --color-ink-3: #2b3038;
+  --color-ink-4: #4a5059;
+  --color-line: #6b727c;
+  --color-line-strong: #40464f;
+  --color-line-input: #1a1d21;
+  --color-canvas: #ffffff;
+}
+
+/* Reduced motion: honour both the OS setting and the in-app toggle. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
