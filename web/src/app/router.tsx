@@ -61,6 +61,10 @@ const routes: RouteObject[] = [
                 path: 'dining/map',
                 lazy: page(() => import('@/features/dining/DiningMapPage'), 'DiningMapPage'),
               },
+              {
+                path: 'dining/:hallId',
+                lazy: page(() => import('@/features/dining/HallDetailPage'), 'HallDetailPage'),
+              },
             ],
           },
         ],
