@@ -53,6 +53,14 @@ const routes: RouteObject[] = [
             element: <AppShell />,
             children: [
               { index: true, lazy: page(() => import('@/features/home/HomePage'), 'HomePage') },
+              {
+                path: 'dining',
+                lazy: page(() => import('@/features/dining/DiningListPage'), 'DiningListPage'),
+              },
+              {
+                path: 'dining/map',
+                lazy: page(() => import('@/features/dining/DiningMapPage'), 'DiningMapPage'),
+              },
             ],
           },
         ],
