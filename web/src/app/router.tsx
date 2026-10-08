@@ -82,6 +82,10 @@ const routes: RouteObject[] = [
                 lazy: page(() => import('@/features/favorites/FavoritesPage'), 'FavoritesPage'),
               },
               {
+                path: 'profile',
+                lazy: page(() => import('@/features/profile/ProfilePage'), 'ProfilePage'),
+              },
+              {
                 path: 'search',
                 lazy: page(() => import('@/features/search/SearchPage'), 'SearchPage'),
               },
