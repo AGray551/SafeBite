@@ -50,6 +50,10 @@ const routes: RouteObject[] = [
             ],
           },
           {
+            path: 'items/:itemId/report',
+            lazy: page(() => import('@/features/menu/ReportPage'), 'ReportPage'),
+          },
+          {
             element: <AppShell />,
             children: [
               { index: true, lazy: page(() => import('@/features/home/HomePage'), 'HomePage') },
