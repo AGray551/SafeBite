@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { createBrowserRouter, type RouteObject } from 'react-router';
+import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 import { AppShell } from '@/components/layout/AppShell';
 import { RequireEntry } from '@/features/auth/RequireEntry';
 import { NotFoundPage } from '@/features/errors/NotFoundPage';
@@ -27,6 +27,28 @@ const routes: RouteObject[] = [
       {
         element: <RequireEntry />,
         children: [
+          {
+            path: 'onboarding',
+            lazy: page(() => import('@/features/onboarding/OnboardingLayout'), 'OnboardingLayout'),
+            children: [
+              { index: true, element: <Navigate to="allergies" replace /> },
+              {
+                path: 'allergies',
+                lazy: page(() => import('@/features/onboarding/AllergiesStep'), 'AllergiesStep'),
+              },
+              {
+                path: 'severity',
+                lazy: page(() => import('@/features/onboarding/SeverityStep'), 'SeverityStep'),
+              },
+              {
+                path: 'preferences',
+                lazy: page(
+                  () => import('@/features/onboarding/PreferencesStep'),
+                  'PreferencesStep',
+                ),
+              },
+            ],
+          },
           {
             element: <AppShell />,
             children: [
