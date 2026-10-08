@@ -66,9 +66,20 @@ export const hoursSchema = z.object({
 });
 export type Hours = z.infer<typeof hoursSchema>;
 
+/**
+ * What kind of place it is. "dining-hall" means all-you-care-to-eat; the
+ * others are retail spots that take dining dollars or card.
+ */
+export const LOCATION_KINDS = ['dining-hall', 'restaurant', 'cafe', 'market'] as const;
+export const locationKindSchema = z.enum(LOCATION_KINDS);
+export type LocationKind = z.infer<typeof locationKindSchema>;
+
 export const diningHallSchema = z.object({
   id: z.string(),
   name: z.string(),
+  kind: locationKindSchema,
+  /** Brands or stations inside the location, e.g. "Bowl Lab". */
+  concepts: z.array(z.string()).optional(),
   /** Building or area, e.g. "Center Village". */
   location: z.string(),
   address: z.string().optional(),

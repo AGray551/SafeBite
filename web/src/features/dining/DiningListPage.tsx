@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useHalls } from '@/api/queries';
-import type { DiningHall } from '@/api/schemas';
+import type { DiningHall, LocationKind } from '@/api/schemas';
 import { Page } from '@/components/layout/Page';
 import { Chip, ChipRow } from '@/components/ui/Chip';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/QueryState';
 import { getOpenStatus } from '@/lib/time';
 import { DiningHeader } from './DiningHeader';
 import { HallCard, type HallMenuSummary } from './HallCard';
+import { LOCATION_KIND_META } from './locationKinds';
 import { useHallSummaries } from './useHallSummaries';
 
 type SortKey = 'name' | 'most-safe';
@@ -26,19 +27,47 @@ export function DiningListPage() {
   const { summaries, menusQuery } = useHallSummaries();
   const [openOnly, setOpenOnly] = useState(false);
   const [sort, setSort] = useState<SortKey>('most-safe');
+  const [kind, setKind] = useState<LocationKind | 'all'>('all');
 
   const halls = useMemo(() => hallsQuery.data ?? [], [hallsQuery.data]);
   const openCount = halls.filter((h) => getOpenStatus(h.todayHours).isOpen).length;
 
   const visible = useMemo(() => {
-    const filtered = openOnly ? halls.filter((h) => getOpenStatus(h.todayHours).isOpen) : halls;
+    const filtered = halls.filter(
+      (h) =>
+        (!openOnly || getOpenStatus(h.todayHours).isOpen) && (kind === 'all' || h.kind === kind),
+    );
     return sortHalls(filtered, sort, summaries);
-  }, [halls, openOnly, sort, summaries]);
+  }, [halls, openOnly, kind, sort, summaries]);
+
+  // Only offer kinds that actually exist in the data.
+  const kinds = [...new Set(halls.map((h) => h.kind))];
 
   return (
     <>
       <DiningHeader view="list" />
       <Page>
+        <ChipRow label="Type of location">
+          <Chip active={kind === 'all'} onClick={() => setKind('all')}>
+            All
+          </Chip>
+          {kinds.map((k) => {
+            const meta = LOCATION_KIND_META[k];
+            const Icon = meta.icon;
+            return (
+              <Chip
+                key={k}
+                active={kind === k}
+                icon={<Icon aria-hidden size={16} />}
+                onClick={() => setKind(k)}
+              >
+                {kind !== k && <Icon aria-hidden size={16} />}
+                {meta.plural}
+              </Chip>
+            );
+          })}
+        </ChipRow>
+
         <ChipRow label="Filter and sort dining halls">
           <Chip active={openOnly} onClick={() => setOpenOnly((v) => !v)}>
             Open now
@@ -63,7 +92,7 @@ export function DiningListPage() {
               · {openCount} open now
             </p>
             {visible.length === 0 ? (
-              <EmptyState title="No dining halls are open right now">
+              <EmptyState title="No matching locations are open right now">
                 Turn off "Open now" to see hours and menus for later today.
               </EmptyState>
             ) : (

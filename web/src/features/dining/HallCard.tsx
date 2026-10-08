@@ -5,6 +5,7 @@ import { FavoriteButton } from '@/features/favorites/FavoriteButton';
 import { cn } from '@/lib/cn';
 import { MEAL_PERIOD_LABELS } from '@/lib/labels';
 import { formatHours, getOpenStatus } from '@/lib/time';
+import { LOCATION_KIND_META } from './locationKinds';
 
 export interface HallMenuSummary {
   mealPeriod: MealPeriod;
@@ -26,6 +27,8 @@ interface HallCardProps {
  */
 export function HallCard({ hall, summary, compact }: HallCardProps) {
   const status = getOpenStatus(hall.todayHours);
+  const kind = LOCATION_KIND_META[hall.kind];
+  const KindIcon = kind.icon;
 
   return (
     <article
@@ -34,9 +37,21 @@ export function HallCard({ hall, summary, compact }: HallCardProps) {
         status.isOpen ? 'bg-surface' : 'border-dashed bg-surface-muted',
       )}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h3 className={cn('text-lg', !status.isOpen && 'text-ink-2')}>{hall.name}</h3>
+      <div className="flex items-start gap-3">
+        <span
+          aria-hidden
+          className={cn(
+            'flex size-11 shrink-0 items-center justify-center rounded-control',
+            status.isOpen ? 'bg-brand-tint text-brand' : 'bg-placeholder text-ink-3',
+          )}
+        >
+          <KindIcon size={22} />
+        </span>
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <h3 className={cn('text-lg leading-tight', !status.isOpen && 'text-ink-2')}>
+            {hall.name}
+          </h3>
+          <span className="sr-only">{kind.label}</span>
           <p className="m-0 flex flex-wrap items-center gap-1.5 text-sm">
             {status.isOpen ? (
               <span className="inline-flex items-center gap-1 font-extrabold text-safe">
@@ -54,6 +69,12 @@ export function HallCard({ hall, summary, compact }: HallCardProps) {
         </div>
         <FavoriteButton kind="hall" id={hall.id} name={hall.name} className="-mt-2 -mr-2" />
       </div>
+
+      {hall.concepts && (
+        <p className="m-0 text-sm text-ink-2">
+          <b>Inside:</b> {hall.concepts.join(' · ')}
+        </p>
+      )}
 
       <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-sm text-ink-2">
         <li className="flex items-center gap-1.5">

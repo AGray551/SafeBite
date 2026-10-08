@@ -1,4 +1,3 @@
-import { MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { useHalls } from '@/api/queries';
 import { Page } from '@/components/layout/Page';
@@ -7,6 +6,7 @@ import { cn } from '@/lib/cn';
 import { getOpenStatus } from '@/lib/time';
 import { DiningHeader } from './DiningHeader';
 import { HallCard } from './HallCard';
+import { LOCATION_KIND_META } from './locationKinds';
 import { useHallSummaries } from './useHallSummaries';
 
 /**
@@ -46,6 +46,7 @@ export function DiningMapPage() {
               {halls.map((hall) => {
                 const isSelected = hall.id === selected?.id;
                 const open = getOpenStatus(hall.todayHours).isOpen;
+                const Icon = LOCATION_KIND_META[hall.kind].icon;
                 return (
                   <button
                     key={hall.id}
@@ -53,17 +54,17 @@ export function DiningMapPage() {
                     aria-pressed={isSelected}
                     onClick={() => setSelectedId(hall.id)}
                     style={{ left: `${hall.mapPosition.x}%`, top: `${hall.mapPosition.y}%` }}
+                    aria-label={`${hall.name}, ${open ? 'open' : 'closed'}`}
                     className={cn(
-                      'absolute flex min-h-11 -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border-2 px-3 text-sm font-bold whitespace-nowrap shadow-sm',
+                      'absolute flex min-h-11 min-w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1.5 rounded-full border-2 text-sm font-bold whitespace-nowrap shadow-sm',
                       isSelected
-                        ? 'border-brand bg-brand text-white'
+                        ? 'z-10 border-brand bg-brand px-3 text-white'
                         : 'border-brand bg-surface text-brand',
-                      !open && !isSelected && 'border-dashed text-ink-2',
+                      !open && !isSelected && 'border-dashed border-ink-3 text-ink-3',
                     )}
                   >
-                    <MapPin aria-hidden size={16} />
-                    {hall.name}
-                    <span className="sr-only">{open ? ', open' : ', closed'}</span>
+                    <Icon aria-hidden size={18} />
+                    {isSelected && <span aria-hidden>{hall.name}</span>}
                   </button>
                 );
               })}

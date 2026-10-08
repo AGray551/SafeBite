@@ -11,7 +11,7 @@ export function DiningHeader({ view }: { view: View }) {
   return (
     <div className="border-b border-line bg-surface">
       <div className="mx-auto flex max-w-3xl flex-col gap-3 px-4 pt-5 pb-4 md:px-6">
-        <h1 className="text-2xl">Dining halls</h1>
+        <h1 className="text-2xl">Campus dining</h1>
         <SegmentedControl<View>
           label="View"
           value={view}
