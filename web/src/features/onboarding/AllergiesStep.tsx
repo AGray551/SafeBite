@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { MAJOR_ALLERGENS } from '@/api/schemas';
 import { Button } from '@/components/ui/Button';
+import { allergenIcon } from '@/features/safety/allergenIcons';
 import { allergenLabel, toAllergenId } from '@/lib/labels';
 import { useOnboarding } from './draft';
 import { SelectTile, TileGrid } from './SelectTile';
@@ -61,12 +62,17 @@ export function AllergiesStep() {
 
       <TileGrid label="Major allergens">
         {MAJOR_ALLERGENS.map((id) => (
-          <SelectTile key={id} selected={selected.has(id)} onToggle={() => toggle(id)}>
+          <SelectTile
+            key={id}
+            selected={selected.has(id)}
+            onToggle={() => toggle(id)}
+            icon={allergenIcon(id)}
+          >
             {allergenLabel(id)}
           </SelectTile>
         ))}
         {customAllergens.map((id) => (
-          <SelectTile key={id} selected onToggle={() => toggle(id)}>
+          <SelectTile key={id} selected onToggle={() => toggle(id)} icon={allergenIcon(id)}>
             {allergenLabel(id)}
           </SelectTile>
         ))}

@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { IconButton } from '@/components/ui/IconButton';
 import { SafetyBadge } from '@/features/safety/SafetyBadge';
 import { cn } from '@/lib/cn';
+import { AllergenIcon } from '@/features/safety/AllergenIcon';
 import { allergenLabel, SEVERITY_LABELS } from '@/lib/labels';
 import { useOnboarding } from './draft';
 
@@ -40,7 +41,10 @@ export function SeverityStep() {
         return (
           <Card key={allergen} className="flex flex-col gap-2 px-3.5 pt-3 pb-3.5">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg">{name}</h3>
+              <h3 className="flex items-center gap-2 text-lg">
+                <AllergenIcon allergen={allergen} size={20} className="text-brand" />
+                {name}
+              </h3>
               <IconButton aria-label={`Remove ${name}`} onClick={() => remove(allergen)}>
                 <X aria-hidden size={20} />
               </IconButton>

@@ -6,6 +6,7 @@ import { useSaveProfile } from '@/api/queries';
 import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { TextField } from '@/components/ui/TextField';
+import { DIETARY_TAG_ICONS } from '@/features/safety/allergenIcons';
 import { DIETARY_TAG_LABELS } from '@/lib/labels';
 import { useOnboarding } from './draft';
 import { SelectTile, TileGrid } from './SelectTile';
@@ -64,6 +65,7 @@ export function PreferencesStep() {
             key={tag}
             selected={draft.preferences.includes(tag)}
             onToggle={() => toggle(tag)}
+            icon={DIETARY_TAG_ICONS[tag]}
           >
             {DIETARY_TAG_LABELS[tag]}
           </SelectTile>

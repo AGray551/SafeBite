@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react';
+import { Check, type LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
@@ -6,17 +6,19 @@ interface SelectTileProps {
   selected: boolean;
   onToggle: () => void;
   children: ReactNode;
+  /** Decorative icon shown before the label. */
+  icon?: LucideIcon;
 }
 
 /** Large checkbox-style tile used in the allergen and preference grids. */
-export function SelectTile({ selected, onToggle, children }: SelectTileProps) {
+export function SelectTile({ selected, onToggle, children, icon: Icon }: SelectTileProps) {
   return (
     <button
       type="button"
       aria-pressed={selected}
       onClick={onToggle}
       className={cn(
-        'flex h-14 items-center gap-2.5 rounded-control px-3.5 text-left text-base text-ink transition-colors',
+        'flex min-h-14 items-center gap-2 rounded-control px-3 py-2 text-left text-base leading-tight text-ink transition-colors',
         selected
           ? 'border-2 border-brand bg-brand-tint font-extrabold'
           : 'border-[1.5px] border-line-strong bg-surface font-semibold hover:bg-canvas',
@@ -30,7 +32,14 @@ export function SelectTile({ selected, onToggle, children }: SelectTileProps) {
       >
         {selected && <Check aria-hidden size={16} strokeWidth={3} />}
       </span>
-      <span className="min-w-0 truncate">{children}</span>
+      {Icon && (
+        <Icon
+          aria-hidden
+          size={18}
+          className={cn('shrink-0', selected ? 'text-brand' : 'text-ink-3')}
+        />
+      )}
+      <span className="min-w-0 flex-1">{children}</span>
     </button>
   );
 }
