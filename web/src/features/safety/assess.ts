@@ -14,7 +14,14 @@
  * Missing allergen data, or no profile at all, gives UNKNOWN. We never call
  * an item safe without having checked it.
  */
-import type { AllergenId, DietaryProfile, DietaryTag, MenuItem, Severity } from '@/api/schemas';
+import {
+  MAJOR_ALLERGENS,
+  type AllergenId,
+  type DietaryProfile,
+  type DietaryTag,
+  type MenuItem,
+  type Severity,
+} from '@/api/schemas';
 import { allergenNoun, DIETARY_TAG_LABELS, joinList } from '@/lib/labels';
 
 export type SafetyStatus = 'safe' | 'caution' | 'avoid' | 'unknown';
@@ -52,10 +59,13 @@ function statusForConflict({ severity, kind }: Conflict): SafetyStatus {
 
 /**
  * Custom allergens (anything outside the nine majors) aren't always tagged by
- * dining services, so we also look for them in the ingredient text.
+ * dining services, so we also look for them in the ingredient text. Majors
+ * are always tagged, and text-matching them gives false positives
+ * ("coconut milk" is not dairy), so they're skipped here.
  */
 function ingredientsMention(item: MenuItem, allergen: AllergenId): boolean {
   if (!item.ingredients) return false;
+  if ((MAJOR_ALLERGENS as readonly string[]).includes(allergen)) return false;
   const word = allergen.replace(/-/g, ' ');
   return new RegExp(`\\b${word}`, 'i').test(item.ingredients);
 }

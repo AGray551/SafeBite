@@ -100,6 +100,11 @@ describe('assessItem', () => {
     expect(assessItem(item, profile).status).toBe('avoid');
   });
 
+  it('does not text-match major allergens (coconut milk is not dairy)', () => {
+    const item = makeItem({ ingredients: 'Chicken, coconut milk, curry paste' });
+    expect(assessItem(item, makeProfile()).status).toBe('safe');
+  });
+
   it('records unmet dietary preferences', () => {
     const profile = makeProfile({ preferences: ['vegan'] });
     const result = assessItem(makeItem({ dietaryTags: ['vegetarian'] }), profile);
