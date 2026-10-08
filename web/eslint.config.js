@@ -9,7 +9,11 @@ export default tseslint.config(
   { ignores: ['dist', 'coverage'] },
   {
     files: ['**/*.{ts,tsx}'],
-    extends: [js.configs.recommended, ...tseslint.configs.recommended, jsxA11y.flatConfigs.recommended],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended,
+      jsxA11y.flatConfigs.recommended,
+    ],
     languageOptions: {
       ecmaVersion: 2022,
       globals: globals.browser,
@@ -21,7 +25,10 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/consistent-type-imports': 'error',
     },
   },

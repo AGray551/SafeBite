@@ -15,6 +15,18 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Split big, rarely-changing libraries into their own cached chunks.
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-dom/client', 'react-router'],
+          data: ['@tanstack/react-query', 'zod'],
+          icons: ['lucide-react'],
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
   },
