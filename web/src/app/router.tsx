@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
-import { AppShell } from '@/components/layout/AppShell';
+import { AppShell, type RouteHandle } from '@/components/layout/AppShell';
 import { RequireEntry } from '@/features/auth/RequireEntry';
 import { NotFoundPage } from '@/features/errors/NotFoundPage';
 import { RouteErrorPage } from '@/features/errors/RouteErrorPage';
@@ -64,6 +64,12 @@ const routes: RouteObject[] = [
               {
                 path: 'dining/:hallId',
                 lazy: page(() => import('@/features/dining/HallDetailPage'), 'HallDetailPage'),
+              },
+              {
+                path: 'items/:itemId',
+                // Item detail has its own bottom action bar instead of the tabs.
+                handle: { hideNav: true } satisfies RouteHandle,
+                lazy: page(() => import('@/features/menu/ItemDetailPage'), 'ItemDetailPage'),
               },
             ],
           },
