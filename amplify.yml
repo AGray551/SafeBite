@@ -1,0 +1,23 @@
+# AWS Amplify Hosting build settings.
+# The web app lives in web/, so it's configured as a monorepo app.
+version: 1
+applications:
+  - appRoot: web
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            # Match the Node version in web/.nvmrc
+            - nvm install
+            - nvm use
+            - npm ci
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: dist
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
