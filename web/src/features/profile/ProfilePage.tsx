@@ -7,6 +7,7 @@ import {
   LogIn,
   LogOut,
   Mail,
+  Palette,
   Pencil,
   ShieldAlert,
   Trash2,
@@ -89,6 +90,7 @@ export function ProfilePage() {
 
         <NotificationSettings />
         <AccessibilitySettings />
+        <VisibilitySettings />
         <PrivacySection />
 
         <SettingsSection title="About SafeBite">
@@ -121,10 +123,10 @@ const SEVERITY_GROUPS: {
   tag: string;
   tone: 'avoid' | 'caution' | 'neutral';
 }[] = [
-  { severity: 'allergy', title: 'Allergies', tag: 'MUST AVOID', tone: 'avoid' },
-  { severity: 'intolerance', title: 'Intolerances', tag: 'LIMIT', tone: 'caution' },
-  { severity: 'preference', title: 'Avoid when possible', tag: 'FILTER ONLY', tone: 'neutral' },
-];
+    { severity: 'allergy', title: 'Allergies', tag: 'MUST AVOID', tone: 'avoid' },
+    { severity: 'intolerance', title: 'Intolerances', tag: 'LIMIT', tone: 'caution' },
+    { severity: 'preference', title: 'Avoid when possible', tag: 'FILTER ONLY', tone: 'neutral' },
+  ];
 
 function DietaryProfileSection() {
   const { data: profile, isLoading } = useProfile();
@@ -247,6 +249,28 @@ function AccessibilitySettings() {
   );
 }
 
+const Themes = [
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'bearcat-red', label: 'Bearcat Red' },
+];
+
+
+function VisibilitySettings() {
+  const { preferences, setPreference } = usePreferences();
+  return (
+    <SettingsSection title="Visibility Settings">
+      <DropDownRow
+        icon={Palette}
+        label="Select theme"
+        value={preferences.theme}
+        onChange={(v) => setPreference('theme', v as Preferences['theme'])}
+        options={Themes}
+      />
+    </SettingsSection>
+  );
+}
+
 function PrivacySection() {
   const { data: profile } = useProfile();
   const deleteProfile = useDeleteProfile();
@@ -323,6 +347,33 @@ function InfoRow({ icon, label, value }: { icon: LucideIcon; label: string; valu
     <div className="flex min-h-14 items-center gap-3 px-4 py-2">
       <RowLabel icon={icon} label={label} />
       <span className="truncate text-sm text-ink-2">{value}</span>
+    </div>
+  );
+}
+
+function DropDownRow({
+  icon,
+  label,
+  value,
+  onChange,
+  options,
+}: { 
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div className="flex min-h-14 items-center gap-3 px-4 py-2">
+      <RowLabel icon={icon} label={label} />
+      <select aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

@@ -8,6 +8,7 @@
  * them at runtime (high contrast, larger text) without touching components.
  *
  * Font sizes are in rem so "Larger text" scales the whole UI.
+ * Default (light) theme. Themes below override these values. 
  */
 @theme {
   --font-sans: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -113,6 +114,57 @@ html[data-contrast='high'] {
   --color-line-strong: #40464f;
   --color-line-input: #1a1d21;
   --color-canvas: #ffffff;
+}
+
+/* ---------- Themes ---------- */
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --color-canvas: #121417;
+  --color-surface: #1c1f24;
+  --color-surface-muted: #23272d;
+  --color-placeholder: #2c3138;
+
+  --color-ink: #f1f2f4;
+  --color-ink-2: #c9cdd3;
+  --color-ink-3: #a3a9b1;
+  --color-ink-4: #7d848d;
+
+  --color-line: #343a42;
+  --color-line-strong: #555c66;
+  --color-line-input: #7d848d;
+
+  --color-brand: #4a7fb8;
+  --color-brand-hover: #5d8fc6;
+  --color-brand-tint: #1f2e40;
+
+  --color-safe-tint: #1a3324;
+  --color-caution-tint: #3a2e10;
+}
+
+html[data-theme='bearcat-red'] {
+  color-scheme: dark;
+
+  --color-canvas: #1f1f1f;
+  --color-surface: #2b2b2b;
+  --color-surface-muted: #333333;
+  --color-placeholder: #3d3d3d;
+
+  --color-ink: #f5f5f5;
+  --color-ink-2: #d6d6d6;
+  --color-ink-3: #b0b0b0;
+  --color-ink-4: #858585;
+
+  --color-line: #444444;
+  --color-line-strong: #5e5e5e;
+  --color-line-input: #858585;
+
+  --color-brand: #e00122;
+  --color-brand-hover: #ff1f3d;
+  --color-brand-tint: #4a1219;
+
+  --color-safe-tint: #1f3a29;
+  --color-caution-tint: #42351a;
 }
 
 /* Reduced motion: honour both the OS setting and the in-app toggle. */
