@@ -4,17 +4,21 @@ export interface Preferences {
   largeText: boolean;
   reducedMotion: boolean;
   highContrast: boolean;
+  theme: 'bearcat-red' | 'dark' | 'light'; 
   notifyFavoriteAvailable: boolean;
   notifyMenuChanges: boolean;
+
 }
 
 export const DEFAULT_PREFERENCES: Preferences = {
   largeText: false,
   reducedMotion: false,
   highContrast: false,
+  theme: 'bearcat-red', 
   notifyFavoriteAvailable: true,
   // Safety alerts are always on. This only controls non-safety menu changes.
   notifyMenuChanges: true,
+
 };
 
 export interface PreferencesContextValue {

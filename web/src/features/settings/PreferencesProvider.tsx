@@ -36,6 +36,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     root.dataset.textSize = preferences.largeText ? 'large' : 'default';
     root.dataset.motion = preferences.reducedMotion ? 'reduced' : 'default';
     root.dataset.contrast = preferences.highContrast ? 'high' : 'default';
+    root.dataset.theme = preferences.theme;
   }, [preferences]);
 
   const setPreference = useCallback<PreferencesContextValue['setPreference']>((key, value) => {
