@@ -10,8 +10,8 @@ import {
 const STORAGE_KEY = 'safebite.preferences';
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
-/** Browser UI color per theme; matches --color-brand / --color-canvas. */
-const THEME_COLOR = { light: '#d50020', dark: '#121212' } as const;
+/** Browser UI color per theme: UC red in light, the dark canvas in dark. */
+const THEME_COLOR = { light: '#e00122', dark: '#121212' } as const;
 
 /** Older builds stored themes that no longer exist ("bearcat-red" was dark). */
 function normalizeTheme(theme: unknown): ThemePreference {

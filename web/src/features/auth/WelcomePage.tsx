@@ -2,6 +2,7 @@ import { Bell, ShieldCheck, Utensils, type LucideIcon } from 'lucide-react';
 import { Link, Navigate, useNavigate } from 'react-router';
 import { ButtonLink } from '@/components/ui/Button';
 import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
+import { LogoMark, Wordmark } from '@/components/ui/Logo';
 import { useAuth } from './authContext';
 
 const FEATURES: { icon: LucideIcon; text: string }[] = [
@@ -28,11 +29,11 @@ export function WelcomePage() {
       className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-6 px-6 pt-9 pb-6"
     >
       <div className="flex items-center gap-3">
-        <div className="flex size-14 items-center justify-center rounded-2xl bg-brand text-on-brand">
-          <ShieldCheck aria-hidden size={32} strokeWidth={2.2} />
-        </div>
+        <LogoMark className="size-16 shrink-0 text-ink" />
         <div>
-          <h1 className="text-[2rem] leading-none tracking-tight">SafeBite</h1>
+          <h1 className="text-[2rem] leading-none">
+            <Wordmark />
+          </h1>
           <p className="mt-1 mb-0 text-sm text-ink-3">University of Cincinnati campus dining</p>
         </div>
       </div>

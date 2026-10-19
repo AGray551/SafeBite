@@ -1,5 +1,5 @@
-import { ShieldCheck } from 'lucide-react';
 import { Link, NavLink, Outlet, ScrollRestoration, useMatches } from 'react-router';
+import { LogoMark, Wordmark } from '@/components/ui/Logo';
 import { cn } from '@/lib/cn';
 import { NAV_ITEMS } from './navItems';
 
@@ -79,14 +79,9 @@ function DesktopNav() {
   return (
     <header className="sticky top-0 z-30 hidden border-b border-line bg-surface md:block">
       <div className="mx-auto flex h-16 max-w-5xl items-center gap-6 px-6">
-        <Link
-          to="/"
-          className="flex items-center gap-2 font-heading text-xl font-extrabold text-ink"
-        >
-          <span className="flex size-9 items-center justify-center rounded-[10px] bg-brand text-on-brand">
-            <ShieldCheck aria-hidden size={20} />
-          </span>
-          SafeBite
+        <Link to="/" className="flex items-center gap-2 text-ink hover:text-ink">
+          <LogoMark className="size-9" />
+          <Wordmark className="text-[1.375rem]" />
         </Link>
         <nav aria-label="Main" className="ml-auto flex gap-1">
           {NAV_ITEMS.map(({ to, label, icon: Icon }) => (

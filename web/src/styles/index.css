@@ -13,6 +13,7 @@
 @theme {
   --font-sans: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-heading: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-logo: 'Archivo', 'Public Sans', system-ui, sans-serif;
 
   /* Surfaces */
   --color-canvas: #f6f5f3;
