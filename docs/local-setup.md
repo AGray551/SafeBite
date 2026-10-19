@@ -2,7 +2,7 @@
 
 How to run SafeBite on your own computer, connected to the team's Supabase project. Takes about 10 minutes.
 
-You need: Node 22 (see `web/.nvmrc`), git, and an invite to the Supabase project from Conner.
+You need: [Node](https://nodejs.org) 20.9 or newer (22 recommended; check with `node -v`), git, and an invite to the Supabase project from Conner.
 
 ## 1. Join the Supabase project
 
@@ -21,11 +21,14 @@ npm install
 
 ## 3. Connect it to Supabase
 
-1. Copy the example settings file:
+1. Create `web/.env.local` from the example file. Run this **inside `web/`**:
 
    ```bash
-   cp .env.example .env.local
+   cp .env.example .env.local      # Mac, Linux, Git Bash, PowerShell
+   copy .env.example .env.local    # Windows Command Prompt
    ```
+
+   Or just create a new file named `.env.local` in the `web` folder (VS Code is easiest) and paste in the lines from step 2. File browsers often hide names starting with a dot, so don't worry if you can't see `.env.example` there.
 
 2. In the dashboard, open **Project Settings → API Keys** and fill in `web/.env.local`:
 
@@ -34,13 +37,13 @@ npm install
    VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...   # the "publishable" key
    ```
 
-3. Start the app:
+3. Start the app, still inside `web/`:
 
    ```bash
    npm run dev
    ```
 
-   Open http://localhost:5173.
+   Open http://localhost:5173. If the app was already running, stop it (Ctrl+C) and start it again so it picks up `.env.local`.
 
 **Only ever use the publishable key.** The dashboard also shows a **secret** key (and a legacy `service_role` key). Those bypass all of the database's access rules, so never put them in the web app, in `.env.local`, in chat messages or in git.
 
@@ -52,7 +55,31 @@ npm install
 2. Open the confirmation email **in the same browser** and click the link. You land on dietary profile setup.
 3. Save a profile. In the dashboard's **Table Editor → dietary_profiles**, there's now a row with your user id.
 
-If something's off, see [Troubleshooting](supabase-setup.md#troubleshooting).
+For sign-in problems, see [Troubleshooting](supabase-setup.md#troubleshooting).
+
+## If `npm run dev` doesn't work
+
+| Message                                                  | Fix                                                                                                    |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `Missing script: "dev"` or `Could not read package.json` | You're not in the `web` folder. `cd` into `SafeBite/web` and try again.                                |
+| `vite: command not found` or `'vite' is not recognized`  | Dependencies aren't installed. Run `npm install` in `web/`.                                            |
+| `npm: command not found` or `'npm' is not recognized`    | Node isn't installed. Install Node 22 from [nodejs.org](https://nodejs.org), then open a new terminal. |
+| Syntax errors, or `Unsupported engine`                   | Node is too old. Check `node -v`; you need 20.9 or newer.                                              |
+| `Port 5173 is in use, trying another one...`             | Another copy is already running. Stop it (Ctrl+C in its terminal), or use the address this one prints. |
+| App runs but uses sample data / fake accounts            | `.env.local` is missing, misnamed or not in `web/`, or the app wasn't restarted after you created it.  |
+
+## Sign-in settings
+
+Locally, sign-up works without changing any Supabase settings. Supabase accepts a confirmation link that returns to the same host name as the project's **Site URL**, and a new project's Site URL is `http://localhost:3000`, so `localhost` is already allowed.
+
+It's still worth pointing the Site URL at the app, because Supabase falls back to it whenever a link has no valid return address. In **Authentication → URL Configuration** (once, for everyone):
+
+| Setting       | Value                                 |
+| ------------- | ------------------------------------- |
+| Site URL      | `http://localhost:5173`               |
+| Redirect URLs | `http://localhost:5173/auth/callback` |
+
+Once the app is hosted, its address **must** be added, because a different host name isn't allowed automatically; see [supabase-setup.md](supabase-setup.md#hosting-the-app-later). The project's other settings are in [supabase-setup.md](supabase-setup.md#2-configure-sign-in).
 
 ## Working with the shared project
 

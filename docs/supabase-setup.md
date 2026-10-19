@@ -41,7 +41,7 @@ In **Authentication → URL Configuration**:
 | Site URL      | `http://localhost:5173`               |
 | Redirect URLs | `http://localhost:5173/auth/callback` |
 
-These tell Supabase where the link in the confirmation email may send students. Add the hosted address once there is one ([below](#hosting-the-app-later)).
+The link in the confirmation email opens `/auth/callback`. Supabase only sends students back to an address on the **Redirect URLs** list or on the same host name as the **Site URL**; anything else falls back to the Site URL. Because a new project's Site URL is `http://localhost:3000`, localhost already works before you change anything. Setting these makes the fallback point at the app. A hosted address is a different host name, so it **must** be added once there is one ([below](#hosting-the-app-later)).
 
 In **Authentication → Sign In / Providers → Email**:
 
