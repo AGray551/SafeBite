@@ -78,7 +78,7 @@ The MVP covers finding dining halls, viewing scraped menus with dietary safety i
 | --- | --- |
 | [`web/`](web/) | Student web app (React + TypeScript + Vite). Runs on a built-in mock API until the backend is ready. See [web/README.md](web/README.md) for setup, architecture and the proposed API contract. |
 | [`supabase/`](supabase/) | Supabase project: database migrations and auth config for student accounts. |
-| [`docs/`](docs/) | Project documentation: Supabase setup, authentication, database. Start at [docs/README.md](docs/README.md). |
+| [`docs/`](docs/) | Project documentation: how SafeBite works, Supabase setup, authentication, database, security. Start at [docs/README.md](docs/README.md). |
 
 The backend API and the menu scraper will live alongside it (for example in `api/` and `scraper/`).
 

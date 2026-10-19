@@ -60,7 +60,7 @@ The web app connects with the publishable key, so these policies are the only th
 
 Nobody can edit or delete a report from the app. The SafeBite team works with reports through the dashboard, which bypasses RLS.
 
-These rules were tested against Postgres 16, with stand-ins for Supabase's roles and `auth` schema: one student can't read or change another student's rows, a guest can't read anything or send a report under someone else's name, invalid values are rejected, and deleting an account removes the profile and favorites but keeps that student's reports, detached from the account.
+These rules were tested against Postgres 16 with stand-ins for Supabase's roles and `auth` schema, and again on the live project (see [security.md](security.md)): one student can't read or change another student's rows, a guest can't read anything or send a report under someone else's name, invalid values are rejected, and deleting an account removes the profile and favorites but keeps that student's reports, detached from the account.
 
 ## Changing the schema
 

@@ -1,8 +1,18 @@
 # Supabase setup
 
-One-time steps to connect a Supabase project to SafeBite. The code and the database schema are already in the repo. These steps happen in the Supabase dashboard, so someone signed in to the project's Supabase account has to do them.
+One-time steps to connect a Supabase project to SafeBite. The code and the database schema are already in the repo.
 
-You need to redo them only for a new Supabase project (for example a separate one for the final demo).
+## Status of the team project
+
+The team's project is **SafeBite** (ref `taljrvrqbfkqzbibaqba`, URL `https://taljrvrqbfkqzbibaqba.supabase.co`).
+
+| Step                   | Status                                                           |
+| ---------------------- | ---------------------------------------------------------------- |
+| 1. Create the tables   | Done on 2026-10-19 (migration `20261019215226_student_accounts`) |
+| 2. Configure sign-in   | **To do** in the dashboard                                       |
+| 3. Connect the web app | Each teammate, on their own machine                              |
+
+Redo all of the steps only for a new Supabase project (for example a separate one for the final demo).
 
 ## 1. Create the tables
 
@@ -44,6 +54,8 @@ In **Project Settings → API Keys**, copy the project URL and the **publishable
 VITE_SUPABASE_URL=https://<project-ref>.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
+
+For the team project, the URL is `https://taljrvrqbfkqzbibaqba.supabase.co`. Get the publishable key from the dashboard, or ask Conner.
 
 Restart `npm run dev`. Each teammate does this on their own machine; `.env.local` is gitignored. For a deployed build, set the same two variables in the hosting provider's environment settings.
 
