@@ -56,7 +56,7 @@ When the signed-in user changes, `AuthProvider` refetches the profile, favorites
 
 ## Security notes
 
-- The browser only ever holds the **publishable** key. What a student can read or change is enforced by row level security in the database ([database.md](database.md)), not by the app.
+- The browser only ever holds the **publishable** key. What a student can read or change is enforced by row level security in the database ([rls.md](rls.md)), not by the app.
 - If the REST backend is built later, it receives the student's Supabase access token as `Authorization: Bearer <token>` and verifies it with the project's JWT keys instead of running its own sign-in.
 
 ## Not built yet
