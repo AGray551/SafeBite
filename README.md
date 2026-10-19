@@ -8,6 +8,7 @@ SafeBite is a responsive web application for University of Cincinnati students t
 - [Issues and implementation plan](https://github.com/AGray551/SafeBite/issues)
 - [Milestones](https://github.com/AGray551/SafeBite/milestones)
 - [Shared Files](https://mailuc-my.sharepoint.com/:f:/g/personal/andrewgw_mail_uc_edu/IgD-XThq_k3NTLBciPaj6OJAAW6xSG-LGkGAtcxJ7nO-jEA?e=flLh8N)
+- [Work In Progress Hosted Version](https://safe-bite-ochre.vercel.app/)
 
 ## Objectives and scope
 
