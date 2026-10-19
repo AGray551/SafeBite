@@ -115,9 +115,7 @@ function toggle(list: string[], id: string, on: boolean): string[] {
  * Mimics the backend's alert job: when a scrape adds an allergen to an item,
  * alert students who avoid that allergen or have the item saved.
  */
-function computeAlerts(): SafetyAlert[] {
-  const profile = read<DietaryProfile | null>(KEYS.profile, null);
-  const favorites = getFavorites();
+function computeAlerts(profile: DietaryProfile | null, favorites: Favorites): SafetyAlert[] {
   const readIds = read<Record<string, string>>(KEYS.readAlerts, {});
 
   return ITEM_FIXTURES.filter((item) => item.changedToday && item.allergens).flatMap((item) => {
@@ -144,7 +142,27 @@ function computeAlerts(): SafetyAlert[] {
 // Client
 // ---------------------------------------------------------------------------
 
-export function createMockClient(): SafeBiteApi {
+export interface MockClientOptions {
+  /**
+   * Where alerts read the student's profile and favorites from. Defaults to
+   * this mock's own localStorage; pass the full API when accounts live
+   * elsewhere (Supabase), so alerts still match the signed-in student.
+   */
+  account?: () => Pick<SafeBiteApi, 'profile' | 'favorites'>;
+}
+
+export function createMockClient({ account }: MockClientOptions = {}): SafeBiteApi {
+  async function currentAlerts(): Promise<SafetyAlert[]> {
+    if (!account) {
+      return computeAlerts(read<DietaryProfile | null>(KEYS.profile, null), getFavorites());
+    }
+    const [profile, favorites] = await Promise.all([
+      account().profile.get(),
+      account().favorites.get(),
+    ]);
+    return computeAlerts(profile, favorites);
+  }
+
   return {
     auth: {
       async signIn({ email, password }) {
@@ -169,6 +187,7 @@ export function createMockClient(): SafeBiteApi {
       async getSession() {
         return delay(read<Session | null>(KEYS.session, null));
       },
+      onSessionChange: () => () => {},
     },
 
     halls: {
@@ -240,12 +259,12 @@ export function createMockClient(): SafeBiteApi {
     },
 
     alerts: {
-      list: async () => delay(computeAlerts()),
+      list: async () => delay(await currentAlerts()),
       async markRead(alertId) {
         const readIds = read<Record<string, string>>(KEYS.readAlerts, {});
         readIds[alertId] = new Date().toISOString();
         write(KEYS.readAlerts, readIds);
-        const alert = computeAlerts().find((a) => a.id === alertId);
+        const alert = (await currentAlerts()).find((a) => a.id === alertId);
         if (!alert) throw new ApiError('Alert not found', 404);
         return delay(alert);
       },

@@ -22,6 +22,7 @@ export default defineConfig({
         manualChunks: {
           react: ['react', 'react-dom', 'react-dom/client', 'react-router'],
           data: ['@tanstack/react-query', 'zod'],
+          supabase: ['@supabase/supabase-js'],
           icons: ['lucide-react'],
         },
       },

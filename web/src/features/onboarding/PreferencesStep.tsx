@@ -75,6 +75,7 @@ export function PreferencesStep() {
       <TextField
         label="Other preference"
         placeholder="e.g. low sodium, no pork"
+        maxLength={200}
         value={draft.otherPreference}
         onChange={(e) => updateDraft((d) => ({ ...d, otherPreference: e.target.value }))}
       />

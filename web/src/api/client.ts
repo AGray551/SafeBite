@@ -2,14 +2,17 @@
  * The contract between the UI and the backend.
  *
  * Every screen talks to the backend through this interface, never through
- * fetch() directly. There are two implementations:
+ * fetch() directly. There are three implementations:
  *
- *   - http/httpClient.ts  → the real REST API (VITE_API_BASE_URL)
- *   - mock/mockClient.ts  → in-browser fixtures + localStorage, so the
- *                           frontend runs today without a backend
+ *   - http/httpClient.ts           → the real REST API (VITE_API_BASE_URL)
+ *   - mock/mockClient.ts           → in-browser fixtures + localStorage, so the
+ *                                    frontend runs today without a backend
+ *   - supabase/supabaseClient.ts   → student accounts (sign-in, profile,
+ *                                    favorites, reports) in Supabase, layered
+ *                                    on one of the other two for dining data
  *
  * When the backend team adds an endpoint, add the method here first; the
- * TypeScript compiler will then point at both clients that need updating.
+ * TypeScript compiler will then point at every client that needs updating.
  */
 import type {
   DietaryProfile,
@@ -49,10 +52,17 @@ export interface ItemSearchQuery {
 export interface SafeBiteApi {
   auth: {
     signIn(input: SignInInput): Promise<Session>;
-    signUp(input: SignUpInput): Promise<Session>;
+    /** Null when the student has to confirm their email before signing in. */
+    signUp(input: SignUpInput): Promise<Session | null>;
     signOut(): Promise<void>;
     /** Returns the stored session, or null when signed out. */
     getSession(): Promise<Session | null>;
+    /**
+     * Calls `listener` when the session changes outside signIn/signOut, e.g. after
+     * an email confirmation link, a token refresh or signing out in another tab.
+     * Returns a function that stops listening.
+     */
+    onSessionChange(listener: (session: Session | null) => void): () => void;
   };
   halls: {
     list(): Promise<DiningHall[]>;

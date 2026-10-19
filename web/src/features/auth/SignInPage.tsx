@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, MailCheck } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import { api } from '@/api';
@@ -45,9 +45,12 @@ export function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
+  /** Set when sign-up needs the student to confirm their email first. */
+  const [confirmationSentTo, setConfirmationSentTo] = useState<string | null>(null);
 
   const setMode = (next: Mode) => {
     setErrors({});
+    setConfirmationSentTo(null);
     setSearchParams(next === 'create' ? { mode: 'create' } : {}, { replace: true });
   };
 
@@ -60,7 +63,11 @@ export function SignInPage() {
     setSubmitting(true);
     try {
       if (mode === 'create') {
-        await signUp({ name: name.trim(), email, password });
+        const session = await signUp({ name: name.trim(), email, password });
+        if (!session) {
+          setConfirmationSentTo(email);
+          return;
+        }
         navigate('/onboarding/allergies', { replace: true });
         return;
       }
@@ -95,73 +102,97 @@ export function SignInPage() {
           ]}
         />
 
-        <div>
-          <h2 className="mb-1.5 text-title">{isCreate ? 'Create your account' : 'Welcome back'}</h2>
-          <p className="m-0 text-ink-2">
-            {isCreate
-              ? 'Save your dietary profile and favorites across devices.'
-              : 'Sign in with your university email to load your dietary profile.'}
-          </p>
-        </div>
-
-        <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {isCreate && (
-            <TextField
-              label="Name"
-              autoComplete="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              error={errors.name}
-            />
-          )}
-          <TextField
-            label="University email"
-            type="email"
-            autoComplete="email"
-            placeholder="yourname@mail.uc.edu"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={errors.email}
-          />
-          <TextField
-            label="Password"
-            type={showPassword ? 'text' : 'password'}
-            autoComplete={isCreate ? 'new-password' : 'current-password'}
-            placeholder={isCreate ? `At least ${MIN_PASSWORD_LENGTH} characters` : 'Enter password'}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={errors.password}
-            trailing={
-              <IconButton
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                onClick={() => setShowPassword((v) => !v)}
-              >
-                {showPassword ? <EyeOff aria-hidden size={20} /> : <Eye aria-hidden size={20} />}
-              </IconButton>
-            }
-          />
-
-          {!isCreate && (
-            // TODO: wire up once the backend supports password reset.
-            <button
-              type="button"
-              className="min-h-11 self-start text-label font-bold text-brand"
-              onClick={() => setErrors({ form: 'Password reset is not available yet.' })}
-            >
-              Forgot password?
-            </button>
-          )}
-
-          {errors.form && (
-            <p role="alert" className="m-0 font-bold text-avoid">
-              {errors.form}
+        {confirmationSentTo ? (
+          <div
+            role="status"
+            className="flex flex-col items-center gap-3 rounded-card border border-line bg-surface p-6 text-center"
+          >
+            <MailCheck aria-hidden size={40} className="text-brand" />
+            <h2 className="text-title">Check your email</h2>
+            <p className="m-0 text-ink-2">
+              We sent a link to <b>{confirmationSentTo}</b>. Open it on this device to finish
+              creating your account.
             </p>
-          )}
+          </div>
+        ) : (
+          <>
+            <div>
+              <h2 className="mb-1.5 text-title">
+                {isCreate ? 'Create your account' : 'Welcome back'}
+              </h2>
+              <p className="m-0 text-ink-2">
+                {isCreate
+                  ? 'Save your dietary profile and favorites across devices.'
+                  : 'Sign in with your university email to load your dietary profile.'}
+              </p>
+            </div>
 
-          <Button type="submit" disabled={submitting}>
-            {submitting ? 'Please wait…' : isCreate ? 'Create Account' : 'Sign In'}
-          </Button>
-        </form>
+            <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-4">
+              {isCreate && (
+                <TextField
+                  label="Name"
+                  autoComplete="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  error={errors.name}
+                />
+              )}
+              <TextField
+                label="University email"
+                type="email"
+                autoComplete="email"
+                placeholder="yourname@mail.uc.edu"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={errors.email}
+              />
+              <TextField
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete={isCreate ? 'new-password' : 'current-password'}
+                placeholder={
+                  isCreate ? `At least ${MIN_PASSWORD_LENGTH} characters` : 'Enter password'
+                }
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={errors.password}
+                trailing={
+                  <IconButton
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    onClick={() => setShowPassword((v) => !v)}
+                  >
+                    {showPassword ? (
+                      <EyeOff aria-hidden size={20} />
+                    ) : (
+                      <Eye aria-hidden size={20} />
+                    )}
+                  </IconButton>
+                }
+              />
+
+              {!isCreate && (
+                // TODO: wire up once the backend supports password reset.
+                <button
+                  type="button"
+                  className="min-h-11 self-start text-label font-bold text-brand"
+                  onClick={() => setErrors({ form: 'Password reset is not available yet.' })}
+                >
+                  Forgot password?
+                </button>
+              )}
+
+              {errors.form && (
+                <p role="alert" className="m-0 font-bold text-avoid">
+                  {errors.form}
+                </p>
+              )}
+
+              <Button type="submit" disabled={submitting}>
+                {submitting ? 'Please wait…' : isCreate ? 'Create Account' : 'Sign In'}
+              </Button>
+            </form>
+          </>
+        )}
 
         <p className="mt-auto mb-0 text-center text-caption text-ink-3">
           Your SafeBite account is separate from your UC login.

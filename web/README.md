@@ -2,7 +2,7 @@
 
 The student-facing SafeBite frontend: a responsive React app for finding UC dining locations, browsing menus and checking every item against your allergies and dietary preferences.
 
-It runs **without a backend** today: an in-browser mock API serves sample data. As soon as the real API exists, set one environment variable and the same screens talk to it instead.
+It runs **without a backend** today: an in-browser mock API serves sample data. Student accounts can use [Supabase](../docs/supabase-setup.md) (set two environment variables), and as soon as the real dining API exists, one more variable switches menus over to it.
 
 ## Getting started
 
@@ -40,6 +40,7 @@ CI (`.github/workflows/web.yml`) runs lint, format check, typecheck, tests and b
 | Styling                   | **Tailwind CSS v4**                | Design tokens from the wireframes live in one CSS file as variables.                                                                                |
 | Icons                     | **lucide-react**                   | Consistent, tree-shakeable icon set.                                                                                                                |
 | Map                       | **Leaflet + react-leaflet**        | Free OpenStreetMap tiles, no API key needed.                                                                                                        |
+| Accounts                  | **Supabase** (`supabase-js`)       | Hosted Postgres + email/password auth with a free tier; row level security keeps each student's data private without writing our own auth server.   |
 | Tests                     | **Vitest + Testing Library**       | Same config as Vite, fast, and tests behaviour the way users see it.                                                                                |
 
 ## Project structure
@@ -51,6 +52,7 @@ src/
     client.ts       SafeBiteApi interface every screen depends on
     http/           Real REST client (used when VITE_API_BASE_URL is set)
     mock/           In-browser mock client + sample data
+    supabase/       Accounts in Supabase (used when VITE_SUPABASE_URL is set)
     queries.ts      React Query hooks (one per endpoint)
   app/            App root, providers and route table
   components/
@@ -69,17 +71,27 @@ Conventions:
 - Screens never call `fetch` directly; they use hooks from `api/queries.ts`.
 - Keep business rules in plain functions with tests (see `features/safety/assess.ts`).
 
+## Connecting Supabase (accounts)
+
+1. Copy `.env.example` to `.env.local`.
+2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from the Supabase dashboard (**Project Settings → API Keys**).
+3. Restart `npm run dev`.
+
+Sign-in, sign-up, sign-out, and each signed-in student's dietary profile, favorites and reports then go to Supabase (`api/supabase/supabaseClient.ts`). Guests still keep their profile and favorites on the device. Halls, menus, items and alerts keep coming from the mock or the REST API. First-time project setup (schema, auth settings) is in [docs/supabase-setup.md](../docs/supabase-setup.md).
+
+If the project requires email confirmation, sign-up shows "Check your email" and the link in the email opens `/auth/callback`, which signs the student in.
+
 ## Connecting the backend
 
 1. Copy `.env.example` to `.env.local`.
 2. Set `VITE_API_BASE_URL` (e.g. `http://localhost:8000/api`).
 3. Restart `npm run dev`.
 
-`src/api/index.ts` switches from the mock to `http/httpClient.ts` automatically. Set `VITE_USE_MOCK_API=true` to force the mock again.
+`src/api/index.ts` switches from the mock to `http/httpClient.ts` automatically. Set `VITE_USE_MOCK_API=true` to force the mock again (for accounts too, even when Supabase is set).
 
 ### Proposed REST endpoints
 
-All responses are JSON and must match the schemas in `src/api/schemas.ts`. Authenticated requests send `Authorization: Bearer <token>`.
+All responses are JSON and must match the schemas in `src/api/schemas.ts`. Authenticated requests send `Authorization: Bearer <token>`. When Supabase is configured, that token is the student's Supabase access token (a JWT the backend can verify with the project's JWT keys), and the `/auth/*`, `/me/profile`, `/me/favorites` and `/reports` endpoints aren't used because those live in Supabase.
 
 | Method             | Path                                         | Returns                                           |
 | ------------------ | -------------------------------------------- | ------------------------------------------------- |
@@ -123,6 +135,6 @@ Status is always shown with an icon, a word **and** a border style (solid, dashe
 - **Sample data:** dishes and hours in `mock/fixtures.ts` are for demo only and need to be replaced by scraped data. Addresses are real; coordinates were looked up from OpenStreetMap.
 - **Map tiles:** the map uses Leaflet with the public OpenStreetMap tile server, which is fine for development and demos. For a public launch, switch `TILE_URL` in `features/dining/CampusMap.tsx` to a tile provider with a usage plan (OpenStreetMap's tile policy doesn't allow heavy production traffic).
 - **Photos:** food images are placeholders until the scraper collects them.
-- **Password reset** isn't wired up (needs backend support).
+- **Password reset** isn't wired up yet. Supabase supports it (`resetPasswordForEmail`); it needs a "set a new password" screen.
 - **Notification toggles** are saved per device; delivering notifications needs the backend.
 - Out of scope for v1 (per the project README): the staff admin dashboard, crowd levels / wait times, and pre-ordering.
