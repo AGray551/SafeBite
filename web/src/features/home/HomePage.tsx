@@ -9,7 +9,7 @@ import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/QueryState';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { useAuth } from '@/features/auth/authContext';
-import { HallCard } from '@/features/dining/HallCard';
+import { HallCard, SafeCount } from '@/features/dining/HallCard';
 import { useHallSummaries } from '@/features/dining/useHallSummaries';
 import {
   matchesQuickFilters,
@@ -77,7 +77,7 @@ export function HomePage() {
         endsAt={mealPeriodEndLabel(mealPeriod)}
       />
 
-      <Page>
+      <Page className="max-w-5xl">
         {/* Wait for the profile so we don't flash the setup prompt. */}
         {!profileLoading && <ProfileSummary summary={describeProfile(profile)} />}
         <AlertBanner />
@@ -113,66 +113,62 @@ export function HomePage() {
 
         {!isLoading && !isError && (
           <>
-            <section aria-labelledby="halls-heading" className="flex flex-col gap-3">
-              <SectionHeader
-                id="halls-heading"
-                title="Places to eat"
-                action={{ label: 'See all', to: '/dining' }}
-              />
-              {bestBet && (
-                <Link
-                  to={`/dining/${bestBet.id}`}
-                  className="flex items-center gap-3 rounded-card bg-brand p-4 text-on-brand hover:bg-brand-hover hover:text-on-brand"
-                >
-                  <div className="flex-1">
-                    <div className="font-heading text-xs font-extrabold tracking-[0.08em] opacity-85">
-                      BEST BET RIGHT NOW
-                    </div>
-                    <div className="font-heading text-xl font-extrabold">{bestBet.name}</div>
-                    <div className="text-sm opacity-90">
-                      {summaries.get(bestBet.id)?.safeCount != null
-                        ? `${summaries.get(bestBet.id)?.safeCount} safe items · `
-                        : ''}
-                      Open {getOpenStatus(bestBet.todayHours).label}
-                    </div>
-                  </div>
-                  <ChevronRight aria-hidden size={24} />
-                </Link>
-              )}
-              <div className="grid gap-3 md:grid-cols-2">
-                {rankedHalls
-                  .filter((h) => h.id !== bestBet?.id)
-                  .slice(0, 2)
-                  .map((hall) => (
-                    <HallCard key={hall.id} hall={hall} summary={summaries.get(hall.id)} compact />
-                  ))}
-              </div>
-            </section>
-
-            <section aria-labelledby="recs-heading" className="flex flex-col gap-3">
-              <SectionHeader
-                id="recs-heading"
-                title="Recommended for you"
-                subtitle="Available now and match your profile"
-                action={{ label: 'More', to: '/search' }}
-              />
-              {recommendations.length === 0 ? (
-                <EmptyState title="Nothing matches right now">
-                  Try removing a filter, or check back when more dining halls are open.
-                </EmptyState>
-              ) : (
-                <div className="grid gap-3 md:grid-cols-2">
-                  {recommendations.map(({ item, assessment }) => (
-                    <MenuItemCard
-                      key={item.id}
-                      item={item}
-                      assessment={assessment}
-                      hallName={hallName(item.hallId)}
-                    />
-                  ))}
+            {/* Side by side on wide screens so the page doesn't leave half of it empty. */}
+            <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+              <section aria-labelledby="halls-heading" className="flex flex-col gap-3">
+                <SectionHeader
+                  id="halls-heading"
+                  title="Places to eat"
+                  action={{ label: 'See all', to: '/dining' }}
+                />
+                {bestBet && (
+                  <BestMatchCard
+                    hallId={bestBet.id}
+                    name={bestBet.name}
+                    safeCount={summaries.get(bestBet.id)?.safeCount ?? null}
+                    openLabel={getOpenStatus(bestBet.todayHours).label}
+                  />
+                )}
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-1">
+                  {rankedHalls
+                    .filter((h) => h.id !== bestBet?.id)
+                    .slice(0, 2)
+                    .map((hall) => (
+                      <HallCard
+                        key={hall.id}
+                        hall={hall}
+                        summary={summaries.get(hall.id)}
+                        compact
+                      />
+                    ))}
                 </div>
-              )}
-            </section>
+              </section>
+
+              <section aria-labelledby="recs-heading" className="flex flex-col gap-3">
+                <SectionHeader
+                  id="recs-heading"
+                  title="Recommended for you"
+                  subtitle="Available now and match your profile"
+                  action={{ label: 'More', to: '/search' }}
+                />
+                {recommendations.length === 0 ? (
+                  <EmptyState title="Nothing matches right now">
+                    Try removing a filter, or check back when more dining halls are open.
+                  </EmptyState>
+                ) : (
+                  <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-1">
+                    {recommendations.map(({ item, assessment }) => (
+                      <MenuItemCard
+                        key={item.id}
+                        item={item}
+                        assessment={assessment}
+                        hallName={hallName(item.hallId)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
 
             <FavoritesPreview hallName={hallName} />
           </>
@@ -195,8 +191,8 @@ function HomeHeader({
   const unread = alerts.filter((a) => !a.readAt).length;
 
   return (
-    <div className="border-b border-line bg-surface">
-      <div className="mx-auto flex max-w-3xl flex-col gap-3 px-4 pt-5 pb-4 md:px-6">
+    <div>
+      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pt-5 md:px-6 md:pt-8">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl">
@@ -215,11 +211,11 @@ function HomeHeader({
                 ? `Notifications, ${unread} unread safety alert${unread > 1 ? 's' : ''}`
                 : 'Notifications'
             }
-            className="relative flex size-11 items-center justify-center rounded-full text-ink hover:bg-canvas"
+            className="relative flex size-11 items-center justify-center rounded-full text-ink hover:bg-surface"
           >
             <Bell aria-hidden size={22} />
             {unread > 0 && (
-              <span className="absolute top-1.5 right-1.5 flex size-4.5 items-center justify-center rounded-full bg-avoid text-2xs font-bold text-on-avoid">
+              <span className="absolute top-1.5 right-1.5 flex size-4.5 items-center justify-center rounded-full bg-avoid-fill text-2xs font-bold text-on-avoid">
                 {unread}
               </span>
             )}
@@ -234,6 +230,46 @@ function HomeHeader({
         </Link>
       </div>
     </div>
+  );
+}
+
+/**
+ * The open hall with the most safe items. A neutral card with a red accent:
+ * big red fills are kept for Avoid warnings and primary buttons.
+ */
+function BestMatchCard({
+  hallId,
+  name,
+  safeCount,
+  openLabel,
+}: {
+  hallId: string;
+  name: string;
+  safeCount: number | null;
+  openLabel: string;
+}) {
+  return (
+    <Link
+      to={`/dining/${hallId}`}
+      className="flex items-center gap-3 rounded-card border border-l-4 border-line border-l-brand bg-surface p-4 text-ink transition-colors hover:border-line-strong hover:border-l-brand hover:text-ink"
+    >
+      <div className="flex flex-1 flex-col gap-1">
+        <div className="font-heading text-xs font-extrabold tracking-[0.08em] text-brand">
+          BEST MATCH RIGHT NOW
+        </div>
+        <div className="font-heading text-xl leading-tight font-extrabold">{name}</div>
+        <div className="flex flex-wrap items-center gap-x-1.5 text-sm text-ink-2">
+          {safeCount !== null && (
+            <>
+              <SafeCount count={safeCount} />
+              <span aria-hidden>·</span>
+            </>
+          )}
+          Open {openLabel}
+        </div>
+      </div>
+      <ChevronRight aria-hidden size={24} className="shrink-0 text-ink-3" />
+    </Link>
   );
 }
 
@@ -255,9 +291,9 @@ function ProfileSummary({ summary }: { summary: string | null }) {
   return (
     <Link
       to="/onboarding/allergies?from=profile"
-      className="flex items-center gap-2.5 rounded-control bg-brand-tint px-3.5 py-3 text-sm text-ink hover:text-ink"
+      className="flex items-center gap-2.5 rounded-control border border-line bg-surface px-3.5 py-3 text-sm text-ink hover:border-line-strong hover:text-ink"
     >
-      <ShieldCheck aria-hidden size={20} className="shrink-0 text-brand" />
+      <ShieldCheck aria-hidden size={20} className="shrink-0 text-safe" />
       <span className="flex-1">
         <b>Filtering for:</b> {summary}
       </span>
@@ -277,7 +313,7 @@ function AlertBanner() {
   return (
     <Link
       to={`/alerts/${latest.id}`}
-      className="flex items-center gap-3 rounded-control border-[3px] border-avoid bg-avoid p-3.5 text-label text-on-avoid hover:text-on-avoid"
+      className="flex items-center gap-3 rounded-control border-[3px] border-avoid bg-avoid-fill p-3.5 text-label text-on-avoid hover:text-on-avoid"
     >
       <TriangleAlert aria-hidden size={22} className="shrink-0" />
       <span className="flex-1">
