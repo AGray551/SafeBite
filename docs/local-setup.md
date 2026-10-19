@@ -1,4 +1,4 @@
-# Local setup (for teammates)
+# Local setup
 
 How to run SafeBite on your own computer, connected to the team's Supabase project. Takes about 10 minutes.
 
