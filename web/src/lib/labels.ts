@@ -78,3 +78,8 @@ export function joinList(items: string[]): string {
   if (items.length <= 1) return items.join('');
   return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
 }
+
+/** "1 safe item", "3 safe items". */
+export function safeItemsLabel(count: number): string {
+  return `${count} safe item${count === 1 ? '' : 's'}`;
+}

@@ -38,7 +38,7 @@ export const STATUS_STYLES: Record<
     icon: OctagonAlert,
     label: 'AVOID',
     shortLabel: 'AVOID',
-    tone: 'bg-avoid text-on-avoid border-avoid border-solid',
+    tone: 'bg-avoid-fill text-on-avoid border-avoid border-solid',
     text: 'text-avoid',
   },
   unknown: {

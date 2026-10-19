@@ -1,9 +1,9 @@
-import { Check, Clock, MapPin, Moon, ShieldCheck, Utensils } from 'lucide-react';
+import { Check, ChevronRight, Clock, MapPin, Moon, ShieldCheck, Utensils } from 'lucide-react';
+import { Link } from 'react-router';
 import type { DiningHall, MealPeriod } from '@/api/schemas';
-import { ButtonLink } from '@/components/ui/Button';
 import { FavoriteButton } from '@/features/favorites/FavoriteButton';
 import { cn } from '@/lib/cn';
-import { MEAL_PERIOD_LABELS } from '@/lib/labels';
+import { MEAL_PERIOD_LABELS, safeItemsLabel } from '@/lib/labels';
 import { formatHours, getOpenStatus } from '@/lib/time';
 import { LOCATION_KIND_META } from './locationKinds';
 
@@ -17,13 +17,15 @@ export interface HallMenuSummary {
 interface HallCardProps {
   hall: DiningHall;
   summary?: HallMenuSummary;
-  /** Compact cards (Home) skip hours and menu counts. */
+  /** Compact cards (Home) skip hours and the item count. */
   compact?: boolean;
 }
 
 /**
- * Dining hall card. Crowd level and wait time from the wireframe are left out
- * until there's a real data source for them (see README → "Later").
+ * Dining hall card. The whole card links to the menu: the name's link
+ * stretches over the card, and the favorite button sits above it.
+ * Crowd level and wait time from the wireframe are left out until there's a
+ * real data source for them (see README → "Later").
  */
 export function HallCard({ hall, summary, compact }: HallCardProps) {
   const status = getOpenStatus(hall.todayHours);
@@ -33,7 +35,7 @@ export function HallCard({ hall, summary, compact }: HallCardProps) {
   return (
     <article
       className={cn(
-        'flex flex-col gap-3 rounded-card border border-line p-4',
+        'relative flex flex-col gap-3 rounded-card border border-line p-4 transition-colors hover:border-line-strong',
         status.isOpen ? 'bg-surface' : 'border-dashed bg-surface-muted',
       )}
     >
@@ -42,14 +44,22 @@ export function HallCard({ hall, summary, compact }: HallCardProps) {
           aria-hidden
           className={cn(
             'flex size-11 shrink-0 items-center justify-center rounded-control',
-            status.isOpen ? 'bg-brand-tint text-brand' : 'bg-placeholder text-ink-3',
+            status.isOpen ? 'bg-canvas text-ink-2' : 'bg-placeholder text-ink-3',
           )}
         >
           <KindIcon size={22} />
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h3 className={cn('text-lg leading-tight', !status.isOpen && 'text-ink-2')}>
-            {hall.name}
+          <h3 className="text-lg leading-tight">
+            <Link
+              to={`/dining/${hall.id}`}
+              className={cn(
+                'after:absolute after:inset-0 after:rounded-card focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-brand',
+                status.isOpen ? 'text-ink hover:text-ink' : 'text-ink-2 hover:text-ink-2',
+              )}
+            >
+              {hall.name}
+            </Link>
           </h3>
           <span className="sr-only">{kind.label}</span>
           <p className="m-0 flex flex-wrap items-center gap-1.5 text-sm">
@@ -67,7 +77,12 @@ export function HallCard({ hall, summary, compact }: HallCardProps) {
             <span className="text-ink-2">· {status.label}</span>
           </p>
         </div>
-        <FavoriteButton kind="hall" id={hall.id} name={hall.name} className="-mt-2 -mr-2" />
+        <FavoriteButton
+          kind="hall"
+          id={hall.id}
+          name={hall.name}
+          className="relative z-10 -mt-2 -mr-2"
+        />
       </div>
 
       {hall.concepts && (
@@ -88,24 +103,34 @@ export function HallCard({ hall, summary, compact }: HallCardProps) {
           </li>
         )}
         {!compact && summary && (
-          <li className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-            <span className="inline-flex items-center gap-1.5">
-              <Utensils aria-hidden size={16} />
-              {MEAL_PERIOD_LABELS[summary.mealPeriod]} · {summary.itemCount} items
-            </span>
-            {summary.safeCount !== null && (
-              <span className="inline-flex items-center gap-1.5 font-bold text-safe">
-                <ShieldCheck aria-hidden size={16} />
-                {summary.safeCount} safe for you
-              </span>
-            )}
+          <li className="flex items-center gap-1.5">
+            <Utensils aria-hidden size={16} className="shrink-0" />
+            {MEAL_PERIOD_LABELS[summary.mealPeriod]} · {summary.itemCount} items
           </li>
         )}
       </ul>
 
-      <ButtonLink to={`/dining/${hall.id}`} variant="secondary" size="md">
-        View menu
-      </ButtonLink>
+      <div className="mt-auto flex items-center justify-between gap-3 border-t border-line pt-3 text-sm">
+        {summary?.safeCount != null ? <SafeCount count={summary.safeCount} /> : <span />}
+        <span aria-hidden className="inline-flex items-center gap-0.5 font-bold text-brand">
+          View menu
+          <ChevronRight size={16} />
+        </span>
+      </div>
     </article>
+  );
+}
+
+/**
+ * "3 safe items for you" in green, or a neutral note when there are none, so
+ * a zero never reads as good news.
+ */
+export function SafeCount({ count }: { count: number }) {
+  if (count === 0) return <span className="text-ink-3">No safe items right now</span>;
+  return (
+    <span className="inline-flex items-center gap-1.5 font-bold text-safe">
+      <ShieldCheck aria-hidden size={16} />
+      {safeItemsLabel(count)} for you
+    </span>
   );
 }

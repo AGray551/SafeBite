@@ -70,7 +70,8 @@ const PAIRS: [string, string, number][] = [
   ['caution', 'surface', UI],
   ['caution', 'caution-tint', UI],
   ['avoid', 'surface', TEXT],
-  ['on-avoid', 'avoid', TEXT],
+  ['on-avoid', 'avoid-fill', TEXT],
+  ['avoid', 'surface', UI], // border around filled Avoid pills
 
   // Control boundaries: inputs, chips, tiles, switches.
   ['line-input', 'surface', UI],
