@@ -4,13 +4,13 @@ One-time steps to connect a Supabase project to SafeBite. The code and the datab
 
 ## Status of the team project
 
-The team's project is **SafeBite** (ref `taljrvrqbfkqzbibaqba`, URL `https://taljrvrqbfkqzbibaqba.supabase.co`).
+The team's project is **SafeBite** (ref `taljrvrqbfkqzbibaqba`, URL `https://taljrvrqbfkqzbibaqba.supabase.co`). The deployed app is **https://safe-bite-ochre.vercel.app** (Vercel).
 
 | Step                   | Status                                                           |
 | ---------------------- | ---------------------------------------------------------------- |
 | 1. Create the tables   | Done on 2026-10-19 (migration `20261019215226_student_accounts`) |
 | 2. Configure sign-in   | **To do** in the dashboard                                       |
-| 3. Connect the web app | Each teammate, on their own machine                              |
+| 3. Connect the web app | Each teammate on their own machine, plus the Vercel project      |
 
 Redo all of the steps only for a new Supabase project (for example a separate one for the final demo).
 
@@ -34,10 +34,10 @@ To check it worked, open **Table Editor**. It should list `dietary_profiles`, `f
 
 In **Authentication → URL Configuration**:
 
-| Setting       | Value                                                                                      |
-| ------------- | ------------------------------------------------------------------------------------------ |
-| Site URL      | Where the app is deployed, or `http://localhost:5173` until it is                          |
-| Redirect URLs | `http://localhost:5173/auth/callback` and, once deployed, `https://<domain>/auth/callback` |
+| Setting       | Value                                                                                        |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| Site URL      | Where the app is deployed: `https://safe-bite-ochre.vercel.app` for the team project         |
+| Redirect URLs | `https://safe-bite-ochre.vercel.app/auth/callback` and `http://localhost:5173/auth/callback` |
 
 In **Authentication → Sign In / Providers → Email**:
 
@@ -57,7 +57,9 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 
 For the team project, the URL is `https://taljrvrqbfkqzbibaqba.supabase.co`. Get the publishable key from the dashboard, or ask Conner.
 
-Restart `npm run dev`. Each teammate does this on their own machine; `.env.local` is gitignored. For a deployed build, set the same two variables in the hosting provider's environment settings.
+Restart `npm run dev`. Each teammate does this on their own machine; `.env.local` is gitignored.
+
+**Vercel (the deployed app).** Someone with access to the Vercel project adds the same two variables under **Settings → Environment Variables** (for Production and Preview), then redeploys. Vite bakes these into the build, so they only take effect after a new deployment. [`web/vercel.json`](../web/vercel.json) sends every path to the app, so links like `/auth/callback` from the confirmation email load instead of returning 404; it assumes the Vercel project's root directory is `web`.
 
 The publishable key is designed to be public (it ships to every browser). Never use the **secret** key (or the legacy `service_role` key) in the web app or commit it: it bypasses row level security.
 
