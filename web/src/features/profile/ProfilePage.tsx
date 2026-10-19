@@ -19,7 +19,7 @@ import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useDeleteProfile, useProfile } from '@/api/queries';
 import type { DietaryProfile, Severity } from '@/api/schemas';
-import { Page } from '@/components/layout/Page';
+import { Page, PageIntro } from '@/components/layout/Page';
 import { Button, ButtonLink } from '@/components/ui/Button';
 import { DietaryBadge } from '@/components/ui/DietaryBadge';
 import { LoadingState } from '@/components/ui/QueryState';
@@ -47,22 +47,20 @@ export function ProfilePage() {
 
   return (
     <>
-      <div className="border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-3xl items-center gap-4 px-4 pt-6 pb-5 md:px-6">
-          <div
-            aria-hidden
-            className="flex size-16 shrink-0 items-center justify-center rounded-full bg-brand font-heading text-xl font-extrabold text-on-brand"
-          >
-            {initials ?? '?'}
-          </div>
-          <div className="min-w-0">
-            <h1 className="truncate text-2xl">{user?.name ?? 'Guest'}</h1>
-            <p className="m-0 truncate text-sm text-ink-3">
-              {user?.email ?? 'Your profile is saved on this device only'}
-            </p>
-          </div>
+      <PageIntro className="flex-row items-center gap-4">
+        <div
+          aria-hidden
+          className="flex size-16 shrink-0 items-center justify-center rounded-full bg-brand font-heading text-xl font-extrabold text-on-brand"
+        >
+          {initials ?? '?'}
         </div>
-      </div>
+        <div className="min-w-0">
+          <h1 className="truncate text-2xl">{user?.name ?? 'Guest'}</h1>
+          <p className="m-0 truncate text-sm text-ink-3">
+            {user?.email ?? 'Your profile is saved on this device only'}
+          </p>
+        </div>
+      </PageIntro>
 
       <Page>
         <DietaryProfileSection />

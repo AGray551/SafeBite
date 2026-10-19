@@ -13,6 +13,7 @@ interface SegmentedControlProps<T extends string> {
   label: string;
   /** Use "tabs" when each segment swaps the content below it. */
   as?: 'buttons' | 'tabs';
+  className?: string;
 }
 
 /** Pill-shaped toggle between a few options (List/Map, Breakfast/Lunch/Dinner). */
@@ -22,13 +23,14 @@ export function SegmentedControl<T extends string>({
   onChange,
   label,
   as = 'buttons',
+  className,
 }: SegmentedControlProps<T>) {
   const isTabs = as === 'tabs';
   return (
     <div
       role={isTabs ? 'tablist' : 'group'}
       aria-label={label}
-      className="flex gap-1 rounded-control bg-placeholder p-1"
+      className={cn('flex gap-1 rounded-control bg-placeholder p-1', className)}
     >
       {segments.map((segment) => {
         const selected = segment.value === value;

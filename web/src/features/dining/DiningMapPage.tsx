@@ -25,7 +25,7 @@ export function DiningMapPage() {
   return (
     <>
       <DiningHeader view="map" />
-      <Page>
+      <Page width="wide">
         {hallsQuery.isLoading && <LoadingState />}
         {hallsQuery.isError && <ErrorState onRetry={() => void hallsQuery.refetch()} />}
 
@@ -50,7 +50,7 @@ export function DiningMapPage() {
                     {selected.halls.length === 1 ? '' : 's'}
                   </p>
                 </div>
-                <div className="grid gap-3 md:grid-cols-2">
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                   {selected.halls.map((hall) => (
                     <HallCard key={hall.id} hall={hall} summary={summaries.get(hall.id)} />
                   ))}

@@ -34,14 +34,17 @@ export function OnboardingLayout() {
       <PageHeader
         title="Dietary profile"
         fallbackTo={exitTo}
-        className="md:top-0"
+        width="narrow"
         actions={
           <Link to={exitTo} className="flex min-h-11 items-center px-3 text-label font-bold">
             {exitTo === '/profile' ? 'Cancel' : 'Skip for now'}
           </Link>
         }
       />
-      <main id="main" className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 px-5 pt-5 pb-6">
+      <main
+        id="main"
+        className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 px-4 pt-5 pb-6 md:px-6 md:pt-8"
+      >
         <div className="flex flex-col gap-2">
           <p className="m-0 text-sm font-bold text-ink-3">
             Step {stepIndex + 1} of {STEPS.length} · <span className="text-ink">{step.label}</span>

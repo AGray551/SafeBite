@@ -3,7 +3,7 @@ import { useDeferredValue, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useHalls, useItemSearch } from '@/api/queries';
 import { MEAL_PERIODS, type MealPeriod } from '@/api/schemas';
-import { Page } from '@/components/layout/Page';
+import { Page, PageIntro } from '@/components/layout/Page';
 import { Chip, ChipRow } from '@/components/ui/Chip';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/QueryState';
 import { Switch } from '@/components/ui/Switch';
@@ -76,42 +76,40 @@ export function SearchPage() {
 
   return (
     <>
-      <div className="border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-3xl flex-col gap-3 px-4 pt-5 pb-4 md:px-6">
-          <h1 className="text-2xl">Search</h1>
-          <div className="relative flex items-center" role="search">
-            <Search
-              aria-hidden
-              size={20}
-              className="pointer-events-none absolute left-3.5 text-ink-3"
-            />
-            <label htmlFor="search-input" className="sr-only">
-              Search food
-            </label>
-            <input
-              id="search-input"
-              type="search"
-              autoComplete="off"
-              value={q}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search food, stations, diets"
-              className="h-12 w-full rounded-control border-[1.5px] border-line-input bg-surface pr-12 pl-11 text-base placeholder:text-ink-3 [&::-webkit-search-cancel-button]:hidden"
-            />
-            {q && (
-              <button
-                type="button"
-                aria-label="Clear search"
-                onClick={() => setQuery('')}
-                className="absolute right-1 flex size-11 items-center justify-center rounded-full text-ink-2 hover:bg-canvas"
-              >
-                <X aria-hidden size={20} />
-              </button>
-            )}
-          </div>
+      <PageIntro width="wide">
+        <h1 className="text-2xl">Search</h1>
+        <div className="relative flex items-center" role="search">
+          <Search
+            aria-hidden
+            size={20}
+            className="pointer-events-none absolute left-3.5 text-ink-3"
+          />
+          <label htmlFor="search-input" className="sr-only">
+            Search food
+          </label>
+          <input
+            id="search-input"
+            type="search"
+            autoComplete="off"
+            value={q}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search food, stations, diets"
+            className="h-12 w-full rounded-control border-[1.5px] border-line-input bg-surface pr-12 pl-11 text-base placeholder:text-ink-3 [&::-webkit-search-cancel-button]:hidden"
+          />
+          {q && (
+            <button
+              type="button"
+              aria-label="Clear search"
+              onClick={() => setQuery('')}
+              className="absolute right-1 flex size-11 items-center justify-center rounded-full text-ink-2 hover:bg-canvas"
+            >
+              <X aria-hidden size={20} />
+            </button>
+          )}
         </div>
-      </div>
+      </PageIntro>
 
-      <Page>
+      <Page width="wide">
         {!hasQuery && (
           <section aria-labelledby="try-heading" className="flex flex-col gap-2">
             <h2 id="try-heading" className="text-sm font-bold tracking-wide text-ink-3">
@@ -200,7 +198,7 @@ export function SearchPage() {
                       </span>
                     )}
                   </h2>
-                  <div className="grid gap-3 md:grid-cols-2">
+                  <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                     {entries.map(({ item, assessment }) => (
                       <MenuItemCard
                         key={item.id}

@@ -2,7 +2,7 @@ import { Bell, ChevronRight, Clock, Search, ShieldCheck, TriangleAlert } from 'l
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { useAlerts, useFavorites, useHalls, useItems } from '@/api/queries';
-import { Page } from '@/components/layout/Page';
+import { Page, PageIntro } from '@/components/layout/Page';
 import { ButtonLink } from '@/components/ui/Button';
 import { Chip, ChipRow } from '@/components/ui/Chip';
 import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
@@ -77,7 +77,7 @@ export function HomePage() {
         endsAt={mealPeriodEndLabel(mealPeriod)}
       />
 
-      <Page className="max-w-5xl">
+      <Page width="wide">
         {/* Wait for the profile so we don't flash the setup prompt. */}
         {!profileLoading && <ProfileSummary summary={describeProfile(profile)} />}
         <AlertBanner />
@@ -191,45 +191,43 @@ function HomeHeader({
   const unread = alerts.filter((a) => !a.readAt).length;
 
   return (
-    <div>
-      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pt-5 md:px-6 md:pt-8">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-2xl">
-              {greeting()}
-              {name ? `, ${name.split(' ')[0]}` : ''}
-            </h1>
-            <p className="m-0 flex items-center gap-1.5 text-sm text-ink-2">
-              <Clock aria-hidden size={15} />
-              <b>{mealPeriodLabel}</b> · served until {endsAt}
-            </p>
-          </div>
-          <Link
-            to="/alerts"
-            aria-label={
-              unread
-                ? `Notifications, ${unread} unread safety alert${unread > 1 ? 's' : ''}`
-                : 'Notifications'
-            }
-            className="relative flex size-11 items-center justify-center rounded-full text-ink hover:bg-surface"
-          >
-            <Bell aria-hidden size={22} />
-            {unread > 0 && (
-              <span className="absolute top-1.5 right-1.5 flex size-4.5 items-center justify-center rounded-full bg-avoid-fill text-2xs font-bold text-on-avoid">
-                {unread}
-              </span>
-            )}
-          </Link>
+    <PageIntro width="wide">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl">
+            {greeting()}
+            {name ? `, ${name.split(' ')[0]}` : ''}
+          </h1>
+          <p className="m-0 flex items-center gap-1.5 text-sm text-ink-2">
+            <Clock aria-hidden size={15} />
+            <b>{mealPeriodLabel}</b> · served until {endsAt}
+          </p>
         </div>
         <Link
-          to="/search"
-          className="flex h-12 items-center gap-2.5 rounded-control border-[1.5px] border-line-input bg-surface px-3.5 text-ink-3 hover:text-ink-2"
+          to="/alerts"
+          aria-label={
+            unread
+              ? `Notifications, ${unread} unread safety alert${unread > 1 ? 's' : ''}`
+              : 'Notifications'
+          }
+          className="relative flex size-11 items-center justify-center rounded-full text-ink hover:bg-surface"
         >
-          <Search aria-hidden size={20} />
-          Search food, e.g. pizza or gluten free
+          <Bell aria-hidden size={22} />
+          {unread > 0 && (
+            <span className="absolute top-1.5 right-1.5 flex size-4.5 items-center justify-center rounded-full bg-avoid-fill text-2xs font-bold text-on-avoid">
+              {unread}
+            </span>
+          )}
         </Link>
       </div>
-    </div>
+      <Link
+        to="/search"
+        className="flex h-12 items-center gap-2.5 rounded-control border-[1.5px] border-line-input bg-surface px-3.5 text-ink-3 hover:text-ink-2"
+      >
+        <Search aria-hidden size={20} />
+        Search food, e.g. pizza or gluten free
+      </Link>
+    </PageIntro>
   );
 }
 

@@ -80,8 +80,11 @@ export function SignInPage() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <PageHeader fallbackTo="/welcome" className="md:top-0" />
-      <main id="main" className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 px-6 pt-5 pb-7">
+      <PageHeader fallbackTo="/welcome" width="narrow" />
+      <main
+        id="main"
+        className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-5 px-4 pt-5 pb-7 md:px-6"
+      >
         <SegmentedControl<Mode>
           label="Account"
           value={mode}

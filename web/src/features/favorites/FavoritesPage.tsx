@@ -2,7 +2,7 @@ import { Check, Heart, Moon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useFavorites, useHalls, useItems } from '@/api/queries';
 import type { DiningHall, MenuItem } from '@/api/schemas';
-import { Page } from '@/components/layout/Page';
+import { Page, PageIntro } from '@/components/layout/Page';
 import { ButtonLink } from '@/components/ui/Button';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/QueryState';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
@@ -31,23 +31,22 @@ export function FavoritesPage() {
 
   return (
     <>
-      <div className="border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-3xl flex-col gap-3 px-4 pt-5 pb-4 md:px-6">
-          <h1 className="text-2xl">Favorites</h1>
-          <SegmentedControl<Tab>
-            as="tabs"
-            label="Favorites"
-            value={tab}
-            onChange={setTab}
-            segments={[
-              { value: 'meals', label: `Meals · ${itemIds.length}` },
-              { value: 'halls', label: `Places · ${hallIds.length}` },
-            ]}
-          />
-        </div>
-      </div>
+      <PageIntro width="wide">
+        <h1 className="text-2xl">Favorites</h1>
+        <SegmentedControl<Tab>
+          as="tabs"
+          label="Favorites"
+          className="md:max-w-sm"
+          value={tab}
+          onChange={setTab}
+          segments={[
+            { value: 'meals', label: `Meals · ${itemIds.length}` },
+            { value: 'halls', label: `Places · ${hallIds.length}` },
+          ]}
+        />
+      </PageIntro>
 
-      <Page>
+      <Page width="wide">
         {favoritesQuery.isLoading && <LoadingState />}
         {favoritesQuery.isError && <ErrorState onRetry={() => void favoritesQuery.refetch()} />}
         {favoritesQuery.isSuccess &&
@@ -132,7 +131,7 @@ function Group({
       <h2 className="text-sm font-bold tracking-wide text-ink-3 uppercase">
         {title} · {entries.length}
       </h2>
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {entries.map(({ item, assessment, hall, availableNow }) => (
           <MenuItemCard
             key={item.id}
@@ -189,7 +188,7 @@ function FavoriteHalls({ hallIds }: { hallIds: string[] }) {
   if (isLoading) return <LoadingState />;
 
   return (
-    <div className="grid gap-3 md:grid-cols-2">
+    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
       {saved.map((hall) => (
         <HallCard key={hall.id} hall={hall} summary={summaries.get(hall.id)} />
       ))}

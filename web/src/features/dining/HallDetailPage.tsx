@@ -44,6 +44,7 @@ export function HallDetailPage() {
   return (
     <>
       <PageHeader
+        width="wide"
         title={hall?.name}
         fallbackTo="/dining"
         actions={hall && <FavoriteButton kind="hall" id={hall.id} name={hall.name} />}
@@ -90,7 +91,7 @@ function HallMenu({ hall }: { hall: DiningHall }) {
   const directionsUrl = `https://www.google.com/maps/search/?api=1&query=${hall.coordinates.lat},${hall.coordinates.lng}`;
 
   return (
-    <Page>
+    <Page width="wide">
       <section className="flex flex-col gap-2">
         <h2 className="text-title">{hall.name}</h2>
         <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-label text-ink-2">
@@ -246,7 +247,7 @@ function HallMenu({ hall }: { hall: DiningHall }) {
                       ))}
                     </Card>
                   ) : (
-                    <div className="grid gap-3 md:grid-cols-2">
+                    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                       {entries.map(({ item, assessment }) => (
                         <MenuItemCard key={item.id} item={item} assessment={assessment} />
                       ))}

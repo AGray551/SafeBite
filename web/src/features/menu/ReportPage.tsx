@@ -42,9 +42,12 @@ export function ReportPage() {
         title="Report an issue"
         backIcon="close"
         fallbackTo={`/items/${itemId}`}
-        className="md:top-0"
+        width="narrow"
       />
-      <main id="main" className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-5 px-5 pt-5 pb-7">
+      <main
+        id="main"
+        className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-5 px-4 pt-5 pb-7 md:px-6"
+      >
         {itemQuery.isLoading && <LoadingState />}
         {itemQuery.isError && <ErrorState onRetry={() => void itemQuery.refetch()} />}
 
