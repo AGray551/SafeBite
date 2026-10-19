@@ -102,10 +102,10 @@ When a scrape adds an allergen to an item, students who avoid that allergen or s
 | Display settings, notification toggles | This browser             | This browser        |
 | Which alerts were read                 | This browser             | This browser        |
 
-Details: [authentication.md](authentication.md) for sign-in, [database.md](database.md) for tables, and [security.md](security.md) for what keeps the data private.
+Details: [authentication.md](authentication.md) for sign-in, [database.md](database.md) for tables, [rls.md](rls.md) for who can access what, and [security.md](security.md) for the overall picture.
 
 ## Tests and CI
 
 - `npm test` runs Vitest. The safety rules, the mock API, the Supabase row conversions, the main UI components and the color contrast of every theme have tests.
 - CI (`.github/workflows/web.yml`) runs lint, format check, typecheck, tests and a production build on every pull request that touches `web/`.
-- Database access rules are tested with SQL against the database; see [security.md](security.md).
+- Database access rules are checked with [`supabase/tests/rls_check.sql`](../supabase/tests/rls_check.sql), run in the Supabase SQL Editor; see [rls.md](rls.md#checking-it).

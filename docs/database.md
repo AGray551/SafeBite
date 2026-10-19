@@ -48,9 +48,9 @@ Incorrect-information reports for the SafeBite team to review (in the dashboard'
 
 Dining halls, menus, menu items and safety alerts. The scraper will own those tables. Until then, `item_id`, `target_id` and hall ids are plain text matching the ids in `web/src/api/mock/fixtures.ts`; add foreign keys once the dining tables exist.
 
-## Who can access what (row level security)
+## Who can access what
 
-The web app connects with the publishable key, so these policies are the only thing keeping data private. Every table has RLS enabled.
+Every table has row level security (RLS) on. In short:
 
 | Table              | Signed-in student                    | Guest (not signed in)          |
 | ------------------ | ------------------------------------ | ------------------------------ |
@@ -58,14 +58,13 @@ The web app connects with the publishable key, so these policies are the only th
 | `favorites`        | Read, add, remove own rows           | Nothing                        |
 | `reports`          | Send as themselves; read own reports | Send anonymously; read nothing |
 
-Nobody can edit or delete a report from the app. The SafeBite team works with reports through the dashboard, which bypasses RLS.
-
-These rules were tested against Postgres 16 with stand-ins for Supabase's roles and `auth` schema, and again on the live project (see [security.md](security.md)): one student can't read or change another student's rows, a guest can't read anything or send a report under someone else's name, invalid values are rejected, and deleting an account removes the profile and favorites but keeps that student's reports, detached from the account.
+The exact policies, why they're written that way, and how to test them are in [rls.md](rls.md).
 
 ## Changing the schema
 
 1. From the repo root: `npx supabase migration new <short_name>`. This creates `supabase/migrations/<timestamp>_<short_name>.sql`.
-2. Write the SQL. **Every new table needs `enable row level security` and policies**, or the app either can't read it or anyone can.
+2. Write the SQL. **Every new table needs RLS and policies**; start from the template in [rls.md](rls.md#adding-a-table).
 3. Update the zod schemas in `web/src/api/schemas.ts` and the row mapping in `web/src/api/supabase/rows.ts` to match.
-4. Apply it: `npx supabase db push`, or paste it into the dashboard's SQL editor.
-5. Commit the migration file. Never edit a migration that has already been applied; add a new one instead.
+4. Apply it: `npx supabase db push` (after `npx supabase link`, see [supabase-setup.md](supabase-setup.md)), or paste it into the dashboard's SQL Editor.
+5. Add the new table to [`supabase/tests/rls_check.sql`](../supabase/tests/rls_check.sql) and run it.
+6. Commit the migration file. Never edit a migration that has already been applied; add a new one instead.

@@ -78,7 +78,7 @@ The MVP covers finding dining halls, viewing scraped menus with dietary safety i
 | --- | --- |
 | [`web/`](web/) | Student web app (React + TypeScript + Vite). Runs on a built-in mock API until the backend is ready. See [web/README.md](web/README.md) for setup, architecture and the proposed API contract. |
 | [`supabase/`](supabase/) | Supabase project: database migrations and auth config for student accounts. |
-| [`docs/`](docs/) | Project documentation: how SafeBite works, Supabase setup, authentication, database, security. Start at [docs/README.md](docs/README.md). |
+| [`docs/`](docs/) | Project documentation: how SafeBite works, Supabase setup, authentication, database, row level security, security. Start at [docs/README.md](docs/README.md). |
 
 The backend API and the menu scraper will live alongside it (for example in `api/` and `scraper/`).
 
@@ -116,7 +116,7 @@ Roles and ownership are recorded per issue. Student-facing web, backend/data (in
 - A responsive web application for implementation and demonstration: React, TypeScript, Vite, Tailwind CSS and TanStack Query (see [web/README.md](web/README.md)).
 - Supabase (Postgres + Auth) for student accounts and their dietary profiles, favorites and reports (see [docs/supabase-setup.md](docs/supabase-setup.md)).
 - A scheduled scraper that collects and normalizes UC Dining menu, ingredient, allergen, and nutrition data.
-- The final frontend, backend, database, authentication, hosting, scraping, and testing stack will be selected and documented in the technology-stack planning issue before implementation begins.
+- Hosting and the scraping stack are still to be selected and documented in the technology-stack planning issue.
 
 ## Risks and constraints
 
