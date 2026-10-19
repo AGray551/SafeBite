@@ -1,6 +1,6 @@
 -- Student account data: dietary profiles, favorites and incorrect-information reports.
 --
--- Accounts themselves live in auth.users (Supabase Auth: email + password, Google, Microsoft).
+-- Accounts themselves live in auth.users (Supabase Auth, email + password).
 -- The web app talks to these tables directly with the publishable key, so row level security is
 -- what keeps each student's data private: every policy below limits a student to their own rows.
 --
