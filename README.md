@@ -77,6 +77,8 @@ The MVP covers finding dining halls, viewing scraped menus with dietary safety i
 | Folder | Contents |
 | --- | --- |
 | [`web/`](web/) | Student web app (React + TypeScript + Vite). Runs on a built-in mock API until the backend is ready. See [web/README.md](web/README.md) for setup, architecture and the proposed API contract. |
+| [`supabase/`](supabase/) | Supabase project: database migrations and auth config for student accounts. |
+| [`docs/`](docs/) | Project documentation: Supabase setup, authentication, database. Start at [docs/README.md](docs/README.md). |
 
 The backend API and the menu scraper will live alongside it (for example in `api/` and `scraper/`).
 
@@ -112,6 +114,7 @@ Roles and ownership are recorded per issue. Student-facing web, backend/data (in
 - Markdown documentation in the repository for the project plan and technical decisions.
 - Figma for UX and prototype work, as tracked in the planning issues.
 - A responsive web application for implementation and demonstration: React, TypeScript, Vite, Tailwind CSS and TanStack Query (see [web/README.md](web/README.md)).
+- Supabase (Postgres + Auth) for student accounts and their dietary profiles, favorites and reports (see [docs/supabase-setup.md](docs/supabase-setup.md)).
 - A scheduled scraper that collects and normalizes UC Dining menu, ingredient, allergen, and nutrition data.
 - The final frontend, backend, database, authentication, hosting, scraping, and testing stack will be selected and documented in the technology-stack planning issue before implementation begins.
 
