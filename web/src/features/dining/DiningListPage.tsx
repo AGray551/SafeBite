@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useHalls } from '@/api/queries';
-import type { DiningHall, LocationKind } from '@/api/schemas';
+import type { DiningHall, LocationCategory } from '@/api/schemas';
 import { Page } from '@/components/layout/Page';
 import { Chip, ChipRow } from '@/components/ui/Chip';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/QueryState';
 import { getOpenStatus } from '@/lib/time';
 import { DiningHeader } from './DiningHeader';
 import { HallCard, type HallMenuSummary } from './HallCard';
-import { LOCATION_KIND_META } from './locationKinds';
+import { groupByCategory, LOCATION_CATEGORY_META } from './locationCategories';
 import { useHallSummaries } from './useHallSummaries';
 
 type SortKey = 'name' | 'most-safe';
@@ -27,42 +27,44 @@ export function DiningListPage() {
   const { summaries, menusQuery } = useHallSummaries();
   const [openOnly, setOpenOnly] = useState(false);
   const [sort, setSort] = useState<SortKey>('most-safe');
-  const [kind, setKind] = useState<LocationKind | 'all'>('all');
+  const [category, setCategory] = useState<LocationCategory | 'all'>('all');
 
   const halls = useMemo(() => hallsQuery.data ?? [], [hallsQuery.data]);
   const openCount = halls.filter((h) => getOpenStatus(h.todayHours).isOpen).length;
 
-  const visible = useMemo(() => {
-    const filtered = halls.filter(
-      (h) =>
-        (!openOnly || getOpenStatus(h.todayHours).isOpen) && (kind === 'all' || h.kind === kind),
-    );
-    return sortHalls(filtered, sort, summaries);
-  }, [halls, openOnly, kind, sort, summaries]);
+  // Every category that has locations, for the chips (counts ignore "Open now").
+  const allSections = useMemo(() => groupByCategory(halls), [halls]);
 
-  // Only offer kinds that actually exist in the data.
-  const kinds = [...new Set(halls.map((h) => h.kind))];
+  const sections = useMemo(() => {
+    const filtered = halls.filter((h) => !openOnly || getOpenStatus(h.todayHours).isOpen);
+    return groupByCategory(
+      sortHalls(filtered, sort, summaries),
+      category === 'all' ? undefined : category,
+    );
+  }, [halls, openOnly, category, sort, summaries]);
+
+  // Locations shown, counted once even if they're in several sections.
+  const shownCount = new Set(sections.flatMap((s) => s.halls.map((h) => h.id))).size;
 
   return (
     <>
       <DiningHeader view="list" />
       <Page width="wide">
-        <ChipRow label="Type of location">
-          <Chip active={kind === 'all'} onClick={() => setKind('all')}>
+        <ChipRow label="Category">
+          <Chip active={category === 'all'} onClick={() => setCategory('all')}>
             All
           </Chip>
-          {kinds.map((k) => {
-            const meta = LOCATION_KIND_META[k];
-            const Icon = meta.icon;
+          {allSections.map(({ category: c, halls: inCategory }) => {
+            const Icon = LOCATION_CATEGORY_META[c].icon;
             return (
               <Chip
-                key={k}
-                active={kind === k}
+                key={c}
+                active={category === c}
                 icon={<Icon aria-hidden size={16} />}
-                onClick={() => setKind(k)}
+                onClick={() => setCategory(c)}
               >
-                {kind !== k && <Icon aria-hidden size={16} />}
-                {meta.plural}
+                {category !== c && <Icon aria-hidden size={16} />}
+                {LOCATION_CATEGORY_META[c].title} · {inCategory.length}
               </Chip>
             );
           })}
@@ -87,24 +89,54 @@ export function DiningListPage() {
           <>
             <p className="m-0 text-sm text-ink-2" aria-live="polite">
               <b>
-                {visible.length} location{visible.length === 1 ? '' : 's'}
+                {shownCount} location{shownCount === 1 ? '' : 's'}
               </b>{' '}
               · {openCount} open now
             </p>
-            {visible.length === 0 ? (
+            {sections.length === 0 ? (
               <EmptyState title="No matching locations are open right now">
                 Turn off "Open now" to see hours and menus for later today.
               </EmptyState>
             ) : (
-              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                {visible.map((hall) => (
-                  <HallCard
-                    key={hall.id}
-                    hall={hall}
-                    summary={menusQuery.isSuccess ? summaries.get(hall.id) : undefined}
-                  />
-                ))}
-              </div>
+              sections.map(({ category: c, halls: inSection }) => {
+                const meta = LOCATION_CATEGORY_META[c];
+                const Icon = meta.icon;
+                return (
+                  <section
+                    key={c}
+                    aria-labelledby={`category-${c}`}
+                    className="flex flex-col gap-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        aria-hidden
+                        className="flex size-10 shrink-0 items-center justify-center rounded-control bg-surface text-ink-2"
+                      >
+                        <Icon size={20} />
+                      </span>
+                      <div>
+                        <h2 id={`category-${c}`} className="text-xl">
+                          {meta.title}{' '}
+                          <span className="text-base font-semibold text-ink-3">
+                            · {inSection.length}
+                          </span>
+                        </h2>
+                        <p className="m-0 text-sm text-ink-3">{meta.description}</p>
+                      </div>
+                    </div>
+                    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                      {inSection.map((hall) => (
+                        <HallCard
+                          key={hall.id}
+                          hall={hall}
+                          category={c}
+                          summary={menusQuery.isSuccess ? summaries.get(hall.id) : undefined}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                );
+              })
             )}
           </>
         )}

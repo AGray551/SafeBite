@@ -18,7 +18,15 @@ export function DiningMapPage() {
   const { summaries } = useHallSummaries();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
-  const halls = useMemo(() => hallsQuery.data ?? [], [hallsQuery.data]);
+  // The map covers Uptown; other campuses are listed below it instead.
+  const halls = useMemo(
+    () => (hallsQuery.data ?? []).filter((h) => h.campus === 'uptown'),
+    [hallsQuery.data],
+  );
+  const offMap = useMemo(
+    () => (hallsQuery.data ?? []).filter((h) => h.campus !== 'uptown'),
+    [hallsQuery.data],
+  );
   const groups = useMemo(() => groupByBuilding(halls), [halls]);
   const selected = groups.find((g) => g.key === selectedKey) ?? groups[0];
 
@@ -46,12 +54,29 @@ export function DiningMapPage() {
                 <div>
                   <h2 className="text-lg">{selected.halls[0]!.location.split(',')[0]}</h2>
                   <p className="m-0 text-sm text-ink-3">
-                    {selected.halls[0]!.address} · {selected.halls.length} location
+                    {selected.halls[0]!.address && `${selected.halls[0]!.address} · `}
+                    {selected.halls.length} location
                     {selected.halls.length === 1 ? '' : 's'}
                   </p>
                 </div>
                 <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                   {selected.halls.map((hall) => (
+                    <HallCard key={hall.id} hall={hall} summary={summaries.get(hall.id)} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {offMap.length > 0 && (
+              <section aria-labelledby="off-map-heading" className="flex flex-col gap-3">
+                <div>
+                  <h2 id="off-map-heading" className="text-lg">
+                    UC Blue Ash
+                  </h2>
+                  <p className="m-0 text-sm text-ink-3">Not shown on the Uptown campus map</p>
+                </div>
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                  {offMap.map((hall) => (
                     <HallCard key={hall.id} hall={hall} summary={summaries.get(hall.id)} />
                   ))}
                 </div>

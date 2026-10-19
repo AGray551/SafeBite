@@ -32,6 +32,7 @@ import { FreshnessNote } from '@/features/safety/FreshnessNote';
 import { useSafety } from '@/features/safety/useSafety';
 import { MEAL_PERIOD_LABELS } from '@/lib/labels';
 import { currentMealPeriod, formatHours, getOpenStatus, toDateKey } from '@/lib/time';
+import { LOCATION_CATEGORY_META } from './locationCategories';
 
 /** Sections after this many start collapsed to keep the page scannable. */
 const EXPANDED_SECTIONS = 3;
@@ -94,6 +95,16 @@ function HallMenu({ hall }: { hall: DiningHall }) {
     <Page width="wide">
       <section className="flex flex-col gap-2">
         <h2 className="text-title">{hall.name}</h2>
+        <ul aria-label="Categories" className="m-0 flex list-none flex-wrap gap-1.5 p-0">
+          {hall.categories.map((t) => (
+            <li
+              key={t.category}
+              className="rounded-full border border-line-strong bg-surface px-2.5 py-0.5 text-caption font-bold text-ink-2"
+            >
+              {LOCATION_CATEGORY_META[t.category].short}: {t.label}
+            </li>
+          ))}
+        </ul>
         <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-label text-ink-2">
           <li className="flex items-center gap-1.5">
             {status.isOpen ? (
