@@ -1,6 +1,6 @@
 # Supabase setup
 
-How to connect SafeBite to Supabase, on your own machine and later on a hosted site. The code and database schema are already in the repo.
+One-time setup of the Supabase project. **Teammates: you want [local-setup.md](local-setup.md) instead.**
 
 ## Status of the team project
 
@@ -10,7 +10,8 @@ The team's project is **SafeBite** (ref `taljrvrqbfkqzbibaqba`, URL `https://tal
 | ------------------------- | ---------------------------------------------------------------- |
 | 1. Create the tables      | Done on 2026-10-19 (migration `20261019215226_student_accounts`) |
 | 2. Configure sign-in      | **To do** in the dashboard                                       |
-| 3. Connect your local app | Each teammate, on their own machine                              |
+| 3. Invite teammates       | Conner                                                           |
+| 4. Connect your local app | Each teammate; see [local-setup.md](local-setup.md)              |
 | Hosting the app           | Later; see [the last section](#hosting-the-app-later)            |
 
 For a brand-new Supabase project (for example a separate one for the final demo), do every step.
@@ -49,25 +50,23 @@ In **Authentication → Sign In / Providers → Email**:
 
 Supabase's built-in email sender only sends a few emails per hour and is meant for testing. Before a demo with many sign-ups, either add your own SMTP server (**Authentication → Emails → SMTP Settings**) or turn **Confirm email** off.
 
-## 3. Connect your local app
+## 3. Invite teammates
 
-Copy `web/.env.example` to `web/.env.local` and fill in the two Supabase values from **Project Settings → API Keys**:
+In the dashboard, open the organization's **Team** settings and **Invite** each teammate by email. On the free plan, invites are for the whole organization.
 
-```bash
-VITE_SUPABASE_URL=https://taljrvrqbfkqzbibaqba.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...   # the "publishable" key, not the secret one
-```
+The team gives everyone the **Owner** role. For reference, the roles available on the free plan:
 
-Restart `npm run dev`. `.env.local` is gitignored, so each teammate does this once on their own machine.
+| Role          | Can                                                                                    |
+| ------------- | -------------------------------------------------------------------------------------- |
+| Owner         | Everything, including billing, deleting the project, and adding or removing owners     |
+| Administrator | Everything except organization settings, moving the project, and adding owners         |
+| Developer     | View data, use the Table and SQL editors, copy API keys. Can't change project settings |
 
-The publishable key is designed to be public: it ships to every browser. Never use the **secret** key (or the legacy `service_role` key) in the web app or commit it, because it bypasses row level security.
+Invites expire after 24 hours, so teammates should accept them promptly. Everyone invited can see the secret key, which bypasses row level security; [local-setup.md](local-setup.md) tells them never to use it in the app.
 
-## 4. Try it
+## 4. Connect your local app and try it
 
-1. Choose **Get Started** and create an account with your email.
-2. Open the confirmation email **in the same browser** and click the link. You land on dietary profile setup.
-3. Save a profile, then check **Table Editor → dietary_profiles** in the dashboard: there's a row with your user id.
-4. Sign out and sign back in. Your profile and favorites load from Supabase.
+Follow [local-setup.md](local-setup.md), the same steps every teammate uses. Its last step creates a test account, which confirms sign-up, the confirmation email and the tables all work together.
 
 ## Troubleshooting
 
@@ -89,6 +88,4 @@ The app is a static site, so it can go on any static host. A test build currentl
 2. **Add the address to Supabase.** In **Authentication → URL Configuration**, set **Site URL** to the hosted address and add `https://<hosted address>/auth/callback` to **Redirect URLs**. Keep the localhost entry so local development still works.
 3. **Serve `index.html` for every path.** The confirmation link opens `/auth/callback` directly, and the host must return the app there, not a 404. [`web/vercel.json`](../web/vercel.json) does this on Vercel (with `web` as the project's root directory). Other hosts have their own setting, such as a `_redirects` file on Netlify or a "single-page app" option.
 
-## Running Supabase on your own machine (optional)
-
-If you have Docker, `npx supabase start` from the repo root runs the whole Supabase stack locally with the same schema ([`supabase/config.toml`](../supabase/config.toml) holds its settings). Put the URL and publishable key it prints into `web/.env.local`. Confirmation emails go to the local Mailpit inbox whose address it also prints. `npx supabase stop` shuts it down.
+To run a private Supabase on your own machine with Docker instead, see [local-setup.md](local-setup.md#optional-your-own-private-supabase).

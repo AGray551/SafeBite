@@ -77,7 +77,7 @@ Conventions:
 2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from the Supabase dashboard (**Project Settings → API Keys**).
 3. Restart `npm run dev`.
 
-Sign-in, sign-up, sign-out, and each signed-in student's dietary profile, favorites and reports then go to Supabase (`api/supabase/supabaseClient.ts`). Guests still keep their profile and favorites on the device. Halls, menus, items and alerts keep coming from the mock or the REST API. First-time project setup (schema, auth settings) is in [docs/supabase-setup.md](../docs/supabase-setup.md).
+Sign-in, sign-up, sign-out, and each signed-in student's dietary profile, favorites and reports then go to Supabase (`api/supabase/supabaseClient.ts`). Guests still keep their profile and favorites on the device. Halls, menus, items and alerts keep coming from the mock or the REST API. Teammates: follow [docs/local-setup.md](../docs/local-setup.md). One-time project setup (schema, auth settings) is in [docs/supabase-setup.md](../docs/supabase-setup.md).
 
 If the project requires email confirmation, sign-up shows "Check your email" and the link in the email opens `/auth/callback`, which signs the student in.
 
