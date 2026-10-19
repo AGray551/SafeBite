@@ -19,7 +19,7 @@ export function SafetyBanner({ status, title, children }: SafetyBannerProps) {
       <div
         className={cn(
           'flex size-10 shrink-0 items-center justify-center rounded-full',
-          status === 'avoid' ? 'bg-white/20' : 'bg-surface',
+          status === 'avoid' ? 'bg-on-avoid/20' : 'bg-surface',
         )}
       >
         <Icon aria-hidden size={22} strokeWidth={2.5} />

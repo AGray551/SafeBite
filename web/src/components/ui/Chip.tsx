@@ -23,7 +23,7 @@ export function Chip({ active, children, icon, hasMenu, className, ...props }: C
       className={cn(
         'inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-bold whitespace-nowrap transition-colors',
         active
-          ? 'border-2 border-brand bg-brand text-white'
+          ? 'border-2 border-brand bg-brand text-on-brand'
           : 'border-[1.5px] border-line-strong bg-surface text-ink hover:bg-canvas',
         className,
       )}

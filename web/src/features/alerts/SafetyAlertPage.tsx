@@ -57,7 +57,7 @@ export function SafetyAlertPage() {
         className="flex w-full max-w-lg flex-col gap-4 rounded-t-3xl bg-surface p-6 md:rounded-3xl"
       >
         <div className="flex items-center gap-2 text-avoid">
-          <span className="flex size-10 items-center justify-center rounded-full bg-avoid text-white">
+          <span className="flex size-10 items-center justify-center rounded-full bg-avoid text-on-avoid">
             <TriangleAlert aria-hidden size={22} />
           </span>
           <span className="font-heading text-xs font-extrabold tracking-[0.08em]">

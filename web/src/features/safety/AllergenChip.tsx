@@ -6,7 +6,7 @@ type Tone = 'neutral' | 'avoid' | 'caution';
 
 const TONES: Record<Tone, string> = {
   neutral: 'border-line-strong bg-surface text-ink-2',
-  avoid: 'border-avoid bg-avoid text-white',
+  avoid: 'border-avoid bg-avoid text-on-avoid',
   caution: 'border-caution border-dashed bg-caution-tint text-caution-ink',
 };
 

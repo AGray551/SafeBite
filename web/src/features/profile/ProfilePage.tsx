@@ -51,7 +51,7 @@ export function ProfilePage() {
         <div className="mx-auto flex max-w-3xl items-center gap-4 px-4 pt-6 pb-5 md:px-6">
           <div
             aria-hidden
-            className="flex size-16 shrink-0 items-center justify-center rounded-full bg-brand font-heading text-xl font-extrabold text-white"
+            className="flex size-16 shrink-0 items-center justify-center rounded-full bg-brand font-heading text-xl font-extrabold text-on-brand"
           >
             {initials ?? '?'}
           </div>
@@ -123,10 +123,10 @@ const SEVERITY_GROUPS: {
   tag: string;
   tone: 'avoid' | 'caution' | 'neutral';
 }[] = [
-    { severity: 'allergy', title: 'Allergies', tag: 'MUST AVOID', tone: 'avoid' },
-    { severity: 'intolerance', title: 'Intolerances', tag: 'LIMIT', tone: 'caution' },
-    { severity: 'preference', title: 'Avoid when possible', tag: 'FILTER ONLY', tone: 'neutral' },
-  ];
+  { severity: 'allergy', title: 'Allergies', tag: 'MUST AVOID', tone: 'avoid' },
+  { severity: 'intolerance', title: 'Intolerances', tag: 'LIMIT', tone: 'caution' },
+  { severity: 'preference', title: 'Avoid when possible', tag: 'FILTER ONLY', tone: 'neutral' },
+];
 
 function DietaryProfileSection() {
   const { data: profile, isLoading } = useProfile();
@@ -250,11 +250,10 @@ function AccessibilitySettings() {
 }
 
 const Themes = [
+  { value: 'system', label: 'Match device' },
   { value: 'light', label: 'Light' },
   { value: 'dark', label: 'Dark' },
-  { value: 'bearcat-red', label: 'Bearcat Red' },
 ];
-
 
 function VisibilitySettings() {
   const { preferences, setPreference } = usePreferences();
@@ -357,7 +356,7 @@ function DropDownRow({
   value,
   onChange,
   options,
-}: { 
+}: {
   icon: LucideIcon;
   label: string;
   value: string;
@@ -367,7 +366,12 @@ function DropDownRow({
   return (
     <div className="flex min-h-14 items-center gap-3 px-4 py-2">
       <RowLabel icon={icon} label={label} />
-      <select aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}>
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-11 rounded-control border-[1.5px] border-line-strong bg-surface px-3 text-sm font-bold text-ink"
+      >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

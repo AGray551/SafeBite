@@ -17,9 +17,13 @@ const TILE_ATTRIBUTION =
  * a dashed outline when everything there is closed.
  */
 function pinIcon(count: number, selected: boolean, anyOpen: boolean) {
-  const fill = selected ? 'var(--color-brand)' : '#ffffff';
+  const fill = selected ? 'var(--color-brand)' : 'var(--color-surface)';
   const stroke = anyOpen ? 'var(--color-brand)' : 'var(--color-ink-3)';
-  const text = selected ? '#ffffff' : anyOpen ? 'var(--color-brand)' : 'var(--color-ink-3)';
+  const text = selected
+    ? 'var(--color-on-brand)'
+    : anyOpen
+      ? 'var(--color-brand)'
+      : 'var(--color-ink-3)';
   const size = selected ? 44 : 36;
 
   return L.divIcon({

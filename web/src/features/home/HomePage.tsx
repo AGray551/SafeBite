@@ -122,7 +122,7 @@ export function HomePage() {
               {bestBet && (
                 <Link
                   to={`/dining/${bestBet.id}`}
-                  className="flex items-center gap-3 rounded-card bg-brand p-4 text-white hover:bg-brand-hover hover:text-white"
+                  className="flex items-center gap-3 rounded-card bg-brand p-4 text-on-brand hover:bg-brand-hover hover:text-on-brand"
                 >
                   <div className="flex-1">
                     <div className="font-heading text-xs font-extrabold tracking-[0.08em] opacity-85">
@@ -219,7 +219,7 @@ function HomeHeader({
           >
             <Bell aria-hidden size={22} />
             {unread > 0 && (
-              <span className="absolute top-1.5 right-1.5 flex size-4.5 items-center justify-center rounded-full bg-avoid text-2xs font-bold text-white">
+              <span className="absolute top-1.5 right-1.5 flex size-4.5 items-center justify-center rounded-full bg-avoid text-2xs font-bold text-on-avoid">
                 {unread}
               </span>
             )}
@@ -277,7 +277,7 @@ function AlertBanner() {
   return (
     <Link
       to={`/alerts/${latest.id}`}
-      className="flex items-center gap-3 rounded-control border-[3px] border-avoid bg-avoid p-3.5 text-label text-white hover:text-white"
+      className="flex items-center gap-3 rounded-control border-[3px] border-avoid bg-avoid p-3.5 text-label text-on-avoid hover:text-on-avoid"
     >
       <TriangleAlert aria-hidden size={22} className="shrink-0" />
       <span className="flex-1">
