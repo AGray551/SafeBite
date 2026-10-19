@@ -46,7 +46,7 @@ export function DiningListPage() {
   return (
     <>
       <DiningHeader view="list" />
-      <Page>
+      <Page width="wide">
         <ChipRow label="Type of location">
           <Chip active={kind === 'all'} onClick={() => setKind('all')}>
             All
@@ -96,7 +96,7 @@ export function DiningListPage() {
                 Turn off "Open now" to see hours and menus for later today.
               </EmptyState>
             ) : (
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {visible.map((hall) => (
                   <HallCard
                     key={hall.id}

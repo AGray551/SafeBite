@@ -58,6 +58,19 @@
 
   --radius-card: 14px;
   --radius-control: 12px;
+
+  /* Welcome story slide entrance. Turned off by the reduced-motion rules below. */
+  --animate-story-in: story-in 260ms ease-out;
+  @keyframes story-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 @layer base {

@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet, ScrollRestoration, useMatches } from 'react-rout
 import { LogoMark, Wordmark } from '@/components/ui/Logo';
 import { cn } from '@/lib/cn';
 import { NAV_ITEMS } from './navItems';
+import { PAGE_GUTTER, PAGE_WIDTH } from './pageWidth';
 
 /** Route `handle` options read by the shell. */
 export interface RouteHandle {
@@ -18,7 +19,8 @@ export function AppShell() {
   const hideNav = matches.some((match) => (match.handle as RouteHandle | undefined)?.hideNav);
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    // --app-bar-height tells sticky page headers to sit below the desktop nav.
+    <div className="flex min-h-dvh flex-col md:[--app-bar-height:4rem]">
       <a
         href="#main"
         className="sr-only z-50 rounded-control bg-brand px-4 py-2 text-on-brand focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
@@ -78,7 +80,9 @@ function MobileNav() {
 function DesktopNav() {
   return (
     <header className="sticky top-0 z-30 hidden border-b border-line bg-surface md:block">
-      <div className="mx-auto flex h-16 max-w-5xl items-center gap-6 px-6">
+      <div
+        className={cn('mx-auto flex h-16 w-full items-center gap-6', PAGE_GUTTER, PAGE_WIDTH.wide)}
+      >
         <Link to="/" className="flex items-center gap-2 text-ink hover:text-ink">
           <LogoMark className="size-9" />
           <Wordmark className="text-[1.375rem]" />
