@@ -35,7 +35,18 @@ function storeSession(session: Session | null) {
   else localStorage.removeItem(SESSION_KEY);
 }
 
-export function createHttpClient(baseUrl: string): SafeBiteApi {
+export interface HttpClientOptions {
+  /**
+   * Supplies the bearer token when sign-in happens elsewhere (Supabase).
+   * Defaults to the token from this client's own /auth endpoints.
+   */
+  getAccessToken?: () => Promise<string | undefined>;
+}
+
+export function createHttpClient(
+  baseUrl: string,
+  { getAccessToken }: HttpClientOptions = {},
+): SafeBiteApi {
   const root = baseUrl.replace(/\/$/, '');
 
   /** fetch wrapper: adds auth + JSON headers, checks status, validates the body. */
@@ -45,7 +56,7 @@ export function createHttpClient(baseUrl: string): SafeBiteApi {
     init: RequestInit & { json?: unknown } = {},
   ): Promise<T> {
     const { json, headers, ...rest } = init;
-    const token = loadSession()?.token;
+    const token = getAccessToken ? await getAccessToken() : loadSession()?.token;
 
     const response = await fetch(`${root}${path}`, {
       ...rest,
@@ -99,6 +110,7 @@ export function createHttpClient(baseUrl: string): SafeBiteApi {
       async getSession() {
         return loadSession();
       },
+      onSessionChange: () => () => {},
     },
     halls: {
       list: () => request('/halls', z.array(diningHallSchema)),
