@@ -12,7 +12,8 @@ export interface AuthContextValue {
   isLoading: boolean;
   continueAsGuest: () => void;
   signIn: (input: SignInInput) => Promise<Session>;
-  signUp: (input: SignUpInput) => Promise<Session>;
+  /** Null when the student has to confirm their email before signing in. */
+  signUp: (input: SignUpInput) => Promise<Session | null>;
   signOut: () => Promise<void>;
 }
 

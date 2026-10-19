@@ -51,4 +51,24 @@ describe('mock API', () => {
     await api.alerts.markRead(alerts[0]!.id);
     expect((await api.alerts.list())[0]!.readAt).not.toBeNull();
   });
+
+  it('raises alerts from the signed-in account when accounts live elsewhere', async () => {
+    const withAccount = createMockClient({
+      account: () => ({
+        ...api,
+        profile: {
+          ...api.profile,
+          get: async () => ({
+            avoid: [{ allergen: 'milk', severity: 'allergy' }],
+            preferences: [],
+            acknowledgedSafetyNotice: true,
+            updatedAt: new Date().toISOString(),
+          }),
+        },
+      }),
+    });
+    // Nothing saved in this mock's own storage, yet the account's profile counts.
+    expect(await api.profile.get()).toBeNull();
+    expect((await withAccount.alerts.list()).map((a) => a.itemId)).toEqual(['cc-chicken-alfredo']);
+  });
 });

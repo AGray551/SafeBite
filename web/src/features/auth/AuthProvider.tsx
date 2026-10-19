@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api, type SignInInput, type SignUpInput } from '@/api';
 import { queryKeys } from '@/api/queries';
+import type { Session } from '@/api/schemas';
 import { AuthContext, type AuthContextValue } from './authContext';
 
 const GUEST_KEY = 'safebite.guest';
@@ -37,26 +38,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     else localStorage.removeItem(GUEST_KEY);
   }, []);
 
-  const onSignedIn = useCallback(
-    (session: Awaited<ReturnType<typeof api.auth.signIn>>) => {
-      setGuest(false);
+  const applySession = useCallback(
+    (session: Session | null) => {
+      const previous = queryClient.getQueryData<Session | null>(queryKeys.session);
       queryClient.setQueryData(queryKeys.session, session);
-      // Profile, favorites and alerts are per-user, so refetch them.
-      void queryClient.invalidateQueries({ queryKey: queryKeys.profile });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.favorites });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.alerts });
+      if (session) setGuest(false);
+      // Profile, favorites and alerts are per-user, so refetch them when the user changes.
+      if (previous?.user.id !== session?.user.id) {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.profile });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.favorites });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.alerts });
+      }
     },
     [queryClient, setGuest],
   );
 
+  // Email confirmation links, token refreshes and other tabs change the session too.
+  useEffect(() => api.auth.onSessionChange(applySession), [applySession]);
+
   const signInMutation = useMutation({
     mutationFn: (input: SignInInput) => api.auth.signIn(input),
-    onSuccess: onSignedIn,
+    onSuccess: applySession,
   });
 
   const signUpMutation = useMutation({
     mutationFn: (input: SignUpInput) => api.auth.signUp(input),
-    onSuccess: onSignedIn,
+    // No session yet means "check your email"; nothing changes until they confirm.
+    onSuccess: (session) => session && applySession(session),
   });
 
   const signOutMutation = useMutation({
