@@ -1,11 +1,11 @@
 import { Check, ChevronRight, Clock, MapPin, Moon, ShieldCheck, Utensils } from 'lucide-react';
 import { Link } from 'react-router';
-import type { DiningHall, MealPeriod } from '@/api/schemas';
+import type { DiningHall, LocationCategory, MealPeriod } from '@/api/schemas';
 import { FavoriteButton } from '@/features/favorites/FavoriteButton';
 import { cn } from '@/lib/cn';
 import { MEAL_PERIOD_LABELS, safeItemsLabel } from '@/lib/labels';
 import { formatHours, getOpenStatus } from '@/lib/time';
-import { LOCATION_KIND_META } from './locationKinds';
+import { LOCATION_CATEGORY_META, primaryTag, tagFor } from './locationCategories';
 
 export interface HallMenuSummary {
   mealPeriod: MealPeriod;
@@ -19,6 +19,11 @@ interface HallCardProps {
   summary?: HallMenuSummary;
   /** Compact cards (Home) skip hours and the item count. */
   compact?: boolean;
+  /**
+   * The category section the card is shown in. Its classification leads the
+   * tags (e.g. "Signature Meal Exchange"); defaults to the main category.
+   */
+  category?: LocationCategory;
 }
 
 /**
@@ -27,10 +32,11 @@ interface HallCardProps {
  * Crowd level and wait time from the wireframe are left out until there's a
  * real data source for them (see README → "Later").
  */
-export function HallCard({ hall, summary, compact }: HallCardProps) {
+export function HallCard({ hall, summary, compact, category }: HallCardProps) {
   const status = getOpenStatus(hall.todayHours);
-  const kind = LOCATION_KIND_META[hall.kind];
-  const KindIcon = kind.icon;
+  const lead = (category && tagFor(hall, category)) ?? primaryTag(hall);
+  const others = hall.categories.filter((t) => t.category !== lead.category);
+  const KindIcon = LOCATION_CATEGORY_META[lead.category].icon;
 
   return (
     <article
@@ -61,7 +67,6 @@ export function HallCard({ hall, summary, compact }: HallCardProps) {
               {hall.name}
             </Link>
           </h3>
-          <span className="sr-only">{kind.label}</span>
           <p className="m-0 flex flex-wrap items-center gap-1.5 text-sm">
             {status.isOpen ? (
               <span className="inline-flex items-center gap-1 font-extrabold text-safe">
@@ -76,6 +81,19 @@ export function HallCard({ hall, summary, compact }: HallCardProps) {
             )}
             <span className="text-ink-2">· {status.label}</span>
           </p>
+          <ul aria-label="Categories" className="m-0 mt-1 flex list-none flex-wrap gap-1.5 p-0">
+            <li className="rounded-full border border-line-strong px-2 py-0.5 text-caption font-bold text-ink-2">
+              {lead.label}
+            </li>
+            {others.map((t) => (
+              <li
+                key={t.category}
+                className="rounded-full bg-canvas px-2 py-0.5 text-caption font-semibold text-ink-2"
+              >
+                {LOCATION_CATEGORY_META[t.category].short}
+              </li>
+            ))}
+          </ul>
         </div>
         <FavoriteButton
           kind="hall"

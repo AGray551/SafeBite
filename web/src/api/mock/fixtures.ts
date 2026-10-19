@@ -6,7 +6,7 @@
  * generated relative to "now" so freshness labels always look realistic, and
  * one hall is deliberately stale to show the out-of-date warning.
  */
-import type { DiningHall, MealPeriod, MenuItem } from '../schemas';
+import type { DiningHall, LocationCategory, LocationTag, MealPeriod, MenuItem } from '../schemas';
 
 /**
  * Addresses come from UC's published location list. Coordinates were looked
@@ -15,42 +15,64 @@ import type { DiningHall, MealPeriod, MenuItem } from '../schemas';
  */
 const BUILDINGS = {
   crc: {
+    campus: 'uptown',
     address: '2820 Bearcat Way, Cincinnati, OH 45221',
     coordinates: { lat: 39.13221, lng: -84.51491 },
   },
   siddall: {
+    campus: 'uptown',
     address: '2603 Scioto Lane, Cincinnati, OH 45219',
     coordinates: { lat: 39.13427, lng: -84.51175 },
   },
   marianSpencer: {
+    campus: 'uptown',
     address: '2911 Scioto Lane, Cincinnati, OH 45219',
     coordinates: { lat: 39.13362, lng: -84.51218 },
   },
   tuc: {
+    campus: 'uptown',
     address: '2766 UC MainStreet, Cincinnati, OH 45221',
     coordinates: { lat: 39.13152, lng: -84.51739 },
   },
   steger: {
+    campus: 'uptown',
     address: '2801 UC MainStreet, Cincinnati, OH 45221',
     coordinates: { lat: 39.13238, lng: -84.51622 },
   },
   aronoff: {
+    campus: 'uptown',
     address: '2624 Clifton Ave, Cincinnati, OH 45221',
     coordinates: { lat: 39.13453, lng: -84.51867 },
   },
   lindner: {
+    campus: 'uptown',
     address: '2906 Woodside Drive, Cincinnati, OH 45221',
     coordinates: { lat: 39.13382, lng: -84.51445 },
   },
   careCrawley: {
+    campus: 'uptown',
     address: '231 Albert Sabin Way, Cincinnati, OH 45267',
     coordinates: { lat: 39.13957, lng: -84.50418 },
   },
   universityHall: {
+    campus: 'uptown',
     address: '51 Goodman Drive, Cincinnati, OH 45221',
     coordinates: { lat: 39.13662, lng: -84.50847 },
   },
-} satisfies Record<string, Pick<DiningHall, 'address' | 'coordinates'>>;
+  teachersDyer: {
+    campus: 'uptown',
+    address: '2610 University Circle, Cincinnati, OH 45221',
+    coordinates: { lat: 39.13035, lng: -84.51904 },
+  },
+  ccm: {
+    campus: 'uptown',
+    coordinates: { lat: 39.13025, lng: -84.51797 },
+  },
+  blueAsh: {
+    campus: 'blue-ash',
+    coordinates: { lat: 39.23352, lng: -84.40017 },
+  },
+} satisfies Record<string, Pick<DiningHall, 'campus' | 'address' | 'coordinates'>>;
 
 type Building = keyof typeof BUILDINGS;
 
@@ -58,7 +80,7 @@ type Building = keyof typeof BUILDINGS;
 function hall(
   id: string,
   name: string,
-  kind: DiningHall['kind'],
+  categories: LocationTag[],
   location: string,
   building: Building,
   hours: [string, string] | null,
@@ -68,7 +90,7 @@ function hall(
   return {
     id,
     name,
-    kind,
+    categories,
     location,
     ...BUILDINGS[building],
     todayHours: hours ? { opensAt: hours[0], closesAt: hours[1] } : null,
@@ -81,12 +103,20 @@ const ALL: MealPeriod[] = ['breakfast', 'lunch', 'dinner'];
 const LUNCH_DINNER: MealPeriod[] = ['lunch', 'dinner'];
 const DAYTIME: MealPeriod[] = ['breakfast', 'lunch'];
 
+/** Category tags, with UC's classification for each. */
+const tag = (category: LocationCategory, label: string): LocationTag => ({ category, label });
+const RESIDENTIAL = tag('dining-hall', 'Residential Dining');
+const CLASSIC_EXCHANGE = tag('meal-exchange', 'Classic Meal Exchange');
+const SIGNATURE_EXCHANGE = tag('meal-exchange', 'Signature Meal Exchange');
+const GRAB_AND_GO = tag('convenience', 'Grab & Go');
+const COFFEE_SHOP = tag('coffee', 'Coffee Shop');
+
 export const HALLS: DiningHall[] = [
   // Residential dining centers (all-you-care-to-eat)
   hall(
     'centercourt',
     'CenterCourt',
-    'dining-hall',
+    [RESIDENTIAL],
     'Campus Recreation Center (CRC)',
     'crc',
     ['07:00', '20:00'],
@@ -95,7 +125,7 @@ export const HALLS: DiningHall[] = [
   hall(
     'marketpointe',
     'MarketPointe',
-    'dining-hall',
+    [RESIDENTIAL],
     'Siddall Hall',
     'siddall',
     ['07:00', '21:00'],
@@ -104,7 +134,7 @@ export const HALLS: DiningHall[] = [
   hall(
     'on-the-green',
     'On the Green (OTG)',
-    'dining-hall',
+    [RESIDENTIAL],
     'Marian Spencer Hall',
     'marianSpencer',
     ['07:30', '19:30'],
@@ -115,17 +145,25 @@ export const HALLS: DiningHall[] = [
   hall(
     'chick-fil-a',
     'Chick-fil-A',
-    'restaurant',
+    [tag('retail', 'Fast Food')],
     'TUC, Level 2',
     'tuc',
     ['10:30', '20:00'],
     LUNCH_DINNER,
   ),
-  hall('pei-wei', 'Pei Wei', 'restaurant', 'TUC, Level 2', 'tuc', ['10:30', '20:00'], LUNCH_DINNER),
+  hall(
+    'pei-wei',
+    'Pei Wei',
+    [tag('retail', 'Asian'), SIGNATURE_EXCHANGE],
+    'TUC, Level 2',
+    'tuc',
+    ['10:30', '20:00'],
+    LUNCH_DINNER,
+  ),
   hall(
     'halal-shack',
     'Halal Shack',
-    'restaurant',
+    [tag('retail', 'Mediterranean / Halal'), SIGNATURE_EXCHANGE],
     'TUC, Level 2',
     'tuc',
     ['11:00', '21:00'],
@@ -134,7 +172,7 @@ export const HALLS: DiningHall[] = [
   hall(
     'cincy-grill',
     'Cincy Grill',
-    'restaurant',
+    [tag('retail', 'American'), CLASSIC_EXCHANGE],
     'TUC, Level 2',
     'tuc',
     ['11:00', '21:00'],
@@ -143,7 +181,7 @@ export const HALLS: DiningHall[] = [
   hall(
     'bearcats-social',
     'Bearcats Social / Bearcats Cafe',
-    'restaurant',
+    [SIGNATURE_EXCHANGE],
     'TUC, Level 3',
     'tuc',
     ['08:00', '21:00'],
@@ -153,7 +191,7 @@ export const HALLS: DiningHall[] = [
   hall(
     'mainstreet-expressmart',
     'MainStreet ExpressMart',
-    'market',
+    [tag('convenience', 'Convenience Store')],
     'TUC, Level 3',
     'tuc',
     ['08:00', '23:00'],
@@ -162,46 +200,74 @@ export const HALLS: DiningHall[] = [
   hall(
     'subway',
     'Subway',
-    'restaurant',
+    [tag('retail', 'Sandwiches')],
     'Steger Student Life Center',
     'steger',
     ['10:00', '22:00'],
     LUNCH_DINNER,
   ),
 
+  // CRC
+  hall(
+    'stadium-view-cafe',
+    'Stadium View Café',
+    [CLASSIC_EXCHANGE],
+    'Campus Recreation Center (CRC)',
+    'crc',
+    ['17:00', '23:00'],
+    ['dinner'],
+  ),
+  hall(
+    'shake-smart',
+    'Shake Smart',
+    [SIGNATURE_EXCHANGE],
+    'CRC entrance',
+    'crc',
+    ['07:00', '19:00'],
+    ALL,
+  ),
+
   // Academic building cafés & coffee
   hall(
     'daap-cafe',
     'DAAP Café',
-    'cafe',
+    [tag('coffee', 'Café / Grab & Go'), CLASSIC_EXCHANGE, GRAB_AND_GO],
     'Aronoff Center, Level 4',
     'aronoff',
     ['08:00', '15:00'],
     DAYTIME,
   ),
   hall(
-    'stadium-view-cafe',
-    'Stadium View Café',
-    'cafe',
-    'Campus Recreation Center (CRC)',
-    'crc',
-    ['17:00', '23:00'],
-    ['dinner'],
+    'teachers-cafe',
+    'Teachers Café',
+    [tag('coffee', 'Café'), CLASSIC_EXCHANGE],
+    'Teachers-Dyer Complex',
+    'teachersDyer',
+    ['08:00', '14:00'],
+    DAYTIME,
   ),
-  hall('shake-smart', 'Shake Smart', 'cafe', 'CRC entrance', 'crc', ['07:00', '19:00'], ALL),
   hall(
     'starbucks-lindner',
     'Starbucks (Lindner College of Business)',
-    'cafe',
+    [COFFEE_SHOP],
     'Carl H. Lindner Hall',
     'lindner',
     ['07:30', '17:00'],
     DAYTIME,
   ),
   hall(
+    'the-86-coffee-bar',
+    'The 86 Coffee Bar',
+    [COFFEE_SHOP],
+    'College-Conservatory of Music (CCM)',
+    'ccm',
+    ['08:00', '16:00'],
+    DAYTIME,
+  ),
+  hall(
     'starbucks-msb',
     'Starbucks (Medical Science Building)',
-    'cafe',
+    [COFFEE_SHOP],
     'Care/Crawley Pavilion',
     'careCrawley',
     ['07:00', '16:00'],
@@ -210,11 +276,22 @@ export const HALLS: DiningHall[] = [
   hall(
     'campus-view-cafe',
     'Campus View Café',
-    'cafe',
+    [tag('coffee', 'Café'), tag('meal-exchange', 'Meal Exchange')],
     'University Hall, Level 4',
     'universityHall',
     ['08:00', '18:00'],
     ALL,
+  ),
+
+  // UC Blue Ash
+  hall(
+    'blue-ash-cafe',
+    'Blue Ash Café',
+    [tag('coffee', 'Café / Grab & Go'), CLASSIC_EXCHANGE, GRAB_AND_GO],
+    'UC Blue Ash',
+    'blueAsh',
+    ['07:30', '15:00'],
+    DAYTIME,
   ),
 ];
 

@@ -67,17 +67,43 @@ export const hoursSchema = z.object({
 export type Hours = z.infer<typeof hoursSchema>;
 
 /**
- * What kind of place it is. "dining-hall" means all-you-care-to-eat; the
- * others are retail spots that take dining dollars or card.
+ * The groups students browse by. A location can be in several, e.g. Halal
+ * Shack is both a food-court restaurant and a meal exchange location.
+ * - dining-hall: residential, all-you-care-to-eat
+ * - meal-exchange: takes a meal swipe for an eligible meal
+ * - retail: food court and chain restaurants
+ * - coffee: coffee shops and cafés
+ * - convenience: convenience stores and grab-and-go
  */
-export const LOCATION_KINDS = ['dining-hall', 'restaurant', 'cafe', 'market'] as const;
-export const locationKindSchema = z.enum(LOCATION_KINDS);
-export type LocationKind = z.infer<typeof locationKindSchema>;
+export const LOCATION_CATEGORIES = [
+  'dining-hall',
+  'meal-exchange',
+  'retail',
+  'coffee',
+  'convenience',
+] as const;
+export const locationCategorySchema = z.enum(LOCATION_CATEGORIES);
+export type LocationCategory = z.infer<typeof locationCategorySchema>;
+
+/** One category a location belongs to, with how UC classifies it there. */
+export const locationTagSchema = z.object({
+  category: locationCategorySchema,
+  /** e.g. "Signature Meal Exchange", "Fast Food", "Coffee Shop". */
+  label: z.string(),
+});
+export type LocationTag = z.infer<typeof locationTagSchema>;
+
+/** Which UC campus a location is on. Only Uptown locations are on the map. */
+export const CAMPUSES = ['uptown', 'blue-ash'] as const;
+export const campusSchema = z.enum(CAMPUSES);
+export type Campus = z.infer<typeof campusSchema>;
 
 export const diningHallSchema = z.object({
   id: z.string(),
   name: z.string(),
-  kind: locationKindSchema,
+  /** Every category the location is in; the first is its main one. */
+  categories: z.array(locationTagSchema).min(1),
+  campus: campusSchema,
   /** Brands or stations inside the location, e.g. "Bowl Lab". */
   concepts: z.array(z.string()).optional(),
   /** Building or area, e.g. "Center Village". */
