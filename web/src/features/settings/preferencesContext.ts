@@ -1,24 +1,25 @@
 import { createContext, useContext } from 'react';
 
+export type ThemePreference = 'system' | 'light' | 'dark';
+
 export interface Preferences {
   largeText: boolean;
   reducedMotion: boolean;
   highContrast: boolean;
-  theme: 'bearcat-red' | 'dark' | 'light'; 
+  /** "system" follows the device's light/dark setting. */
+  theme: ThemePreference;
   notifyFavoriteAvailable: boolean;
   notifyMenuChanges: boolean;
-
 }
 
 export const DEFAULT_PREFERENCES: Preferences = {
   largeText: false,
   reducedMotion: false,
   highContrast: false,
-  theme: 'bearcat-red', 
+  theme: 'system',
   notifyFavoriteAvailable: true,
   // Safety alerts are always on. This only controls non-safety menu changes.
   notifyMenuChanges: true,
-
 };
 
 export interface PreferencesContextValue {

@@ -27,7 +27,7 @@ export function SelectTile({ selected, onToggle, children, icon: Icon }: SelectT
       <span
         className={cn(
           'flex size-6 shrink-0 items-center justify-center rounded-md',
-          selected ? 'bg-brand text-white' : 'border-2 border-line-strong bg-surface',
+          selected ? 'bg-brand text-on-brand' : 'border-2 border-line-strong bg-surface',
         )}
       >
         {selected && <Check aria-hidden size={16} strokeWidth={3} />}

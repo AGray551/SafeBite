@@ -8,34 +8,35 @@
  * them at runtime (high contrast, larger text) without touching components.
  *
  * Font sizes are in rem so "Larger text" scales the whole UI.
- * Default (light) theme. Themes below override these values. 
+ * Default (light) theme. The dark theme below overrides these values.
  */
 @theme {
   --font-sans: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-heading: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Surfaces */
-  --color-canvas: #f4f4f1;
+  --color-canvas: #f6f5f3;
   --color-surface: #ffffff;
-  --color-surface-muted: #fafaf8;
-  --color-placeholder: #e8e9eb;
+  --color-surface-muted: #faf9f8;
+  --color-placeholder: #ecebe9;
 
-  /* Text, darkest to lightest */
+  /* Text, darkest to lightest. All pass 4.5:1 on every surface. */
   --color-ink: #1a1d21;
   --color-ink-2: #40464f;
   --color-ink-3: #5a616b;
-  --color-ink-4: #9aa0a8;
+  --color-ink-4: #62686f;
 
-  /* Borders */
+  /* Borders. line-strong and line-input bound controls, so they need 3:1. */
   --color-line: #d5d8dd;
-  --color-line-strong: #9aa0a8;
-  --color-line-input: #7d848d;
+  --color-line-strong: #80868e;
+  --color-line-input: #6f757d;
   --color-line-dashed: #b3b8bf;
 
-  /* Brand (UC-inspired navy) */
-  --color-brand: #1b3a5c;
-  --color-brand-hover: #10263d;
-  --color-brand-tint: #e2e9f1;
+  /* Brand (UC red). on-brand is the text/icon color used on a brand fill. */
+  --color-brand: #d50020;
+  --color-brand-hover: #a8001a;
+  --color-brand-tint: #fde8eb;
+  --color-on-brand: #ffffff;
 
   /* Safety statuses. Never used alone: always paired with an icon + label. */
   --color-safe: #1b5e32;
@@ -44,6 +45,7 @@
   --color-caution-ink: #6e4300;
   --color-caution-tint: #fff0cc;
   --color-avoid: #9b1c24;
+  --color-on-avoid: #ffffff;
 
   /* Type scale (rem-based so it respects "Larger text") */
   --text-2xs: 0.6875rem; /* 11px */
@@ -109,62 +111,58 @@ html[data-text-size='large'] {
 html[data-contrast='high'] {
   --color-ink-2: #1a1d21;
   --color-ink-3: #2b3038;
-  --color-ink-4: #4a5059;
+  --color-ink-4: #40464f;
   --color-line: #6b727c;
   --color-line-strong: #40464f;
   --color-line-input: #1a1d21;
   --color-canvas: #ffffff;
 }
 
-/* ---------- Themes ---------- */
-
+/* ---------- Dark theme ----------
+ * UC black with a lighter UC red. Status colors are lightened too, so a dark
+ * fill (on-brand / on-avoid) carries the text instead of white.
+ * PreferencesProvider resolves "system" to light or dark before setting this.
+ */
 html[data-theme='dark'] {
   color-scheme: dark;
-  --color-canvas: #121417;
-  --color-surface: #1c1f24;
-  --color-surface-muted: #23272d;
-  --color-placeholder: #2c3138;
 
-  --color-ink: #f1f2f4;
-  --color-ink-2: #c9cdd3;
-  --color-ink-3: #a3a9b1;
-  --color-ink-4: #7d848d;
-
-  --color-line: #343a42;
-  --color-line-strong: #555c66;
-  --color-line-input: #7d848d;
-
-  --color-brand: #4a7fb8;
-  --color-brand-hover: #5d8fc6;
-  --color-brand-tint: #1f2e40;
-
-  --color-safe-tint: #1a3324;
-  --color-caution-tint: #3a2e10;
-}
-
-html[data-theme='bearcat-red'] {
-  color-scheme: dark;
-
-  --color-canvas: #1f1f1f;
-  --color-surface: #2b2b2b;
-  --color-surface-muted: #333333;
-  --color-placeholder: #3d3d3d;
+  --color-canvas: #121212;
+  --color-surface: #1d1d1d;
+  --color-surface-muted: #262626;
+  --color-placeholder: #2e2e2e;
 
   --color-ink: #f5f5f5;
   --color-ink-2: #d6d6d6;
-  --color-ink-3: #b0b0b0;
-  --color-ink-4: #858585;
+  --color-ink-3: #ababab;
+  --color-ink-4: #a3a3a3;
 
-  --color-line: #444444;
-  --color-line-strong: #5e5e5e;
-  --color-line-input: #858585;
+  --color-line: #3a3a3a;
+  --color-line-strong: #7c7c7c;
+  --color-line-input: #8f8f8f;
+  --color-line-dashed: #5c5c5c;
 
-  --color-brand: #e00122;
-  --color-brand-hover: #ff1f3d;
-  --color-brand-tint: #4a1219;
+  --color-brand: #ff6b78;
+  --color-brand-hover: #ff8d97;
+  --color-brand-tint: #3f1519;
+  --color-on-brand: #1a0004;
 
-  --color-safe-tint: #1f3a29;
-  --color-caution-tint: #42351a;
+  --color-safe: #5fd08f;
+  --color-safe-tint: #12301f;
+  --color-caution: #e0a43a;
+  --color-caution-ink: #f5c66b;
+  --color-caution-tint: #372a0b;
+  --color-avoid: #ff8a80;
+  --color-on-avoid: #1f0400;
+}
+
+html[data-theme='dark'][data-contrast='high'] {
+  --color-canvas: #000000;
+  --color-ink-2: #f5f5f5;
+  --color-ink-3: #e0e0e0;
+  --color-ink-4: #cccccc;
+  --color-line: #8f8f8f;
+  --color-line-strong: #c2c2c2;
+  --color-line-input: #f5f5f5;
 }
 
 /* Reduced motion: honour both the OS setting and the in-app toggle. */

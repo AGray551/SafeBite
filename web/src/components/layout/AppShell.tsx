@@ -21,7 +21,7 @@ export function AppShell() {
     <div className="flex min-h-dvh flex-col">
       <a
         href="#main"
-        className="sr-only z-50 rounded-control bg-brand px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+        className="sr-only z-50 rounded-control bg-brand px-4 py-2 text-on-brand focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
       >
         Skip to content
       </a>
@@ -83,7 +83,7 @@ function DesktopNav() {
           to="/"
           className="flex items-center gap-2 font-heading text-xl font-extrabold text-ink"
         >
-          <span className="flex size-9 items-center justify-center rounded-[10px] bg-brand text-white">
+          <span className="flex size-9 items-center justify-center rounded-[10px] bg-brand text-on-brand">
             <ShieldCheck aria-hidden size={20} />
           </span>
           SafeBite

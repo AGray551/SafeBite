@@ -28,7 +28,7 @@ export function WelcomePage() {
       className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-6 px-6 pt-9 pb-6"
     >
       <div className="flex items-center gap-3">
-        <div className="flex size-14 items-center justify-center rounded-2xl bg-brand text-white">
+        <div className="flex size-14 items-center justify-center rounded-2xl bg-brand text-on-brand">
           <ShieldCheck aria-hidden size={32} strokeWidth={2.2} />
         </div>
         <div>

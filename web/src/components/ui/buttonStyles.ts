@@ -12,7 +12,7 @@ export interface StyleProps {
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    'bg-brand text-white border-brand hover:bg-brand-hover hover:border-brand-hover hover:text-white',
+    'bg-brand text-on-brand border-brand hover:bg-brand-hover hover:border-brand-hover hover:text-on-brand',
   secondary: 'bg-surface text-brand border-brand hover:bg-brand-tint',
   destructive: 'bg-surface text-avoid border-avoid hover:bg-avoid/5 hover:text-avoid',
 };
