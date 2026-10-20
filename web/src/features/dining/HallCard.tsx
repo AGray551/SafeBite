@@ -5,7 +5,7 @@ import { FavoriteButton } from '@/features/favorites/FavoriteButton';
 import { cn } from '@/lib/cn';
 import { MEAL_PERIOD_LABELS, safeItemsLabel } from '@/lib/labels';
 import { formatHours, getOpenStatus } from '@/lib/time';
-import { LOCATION_CATEGORY_META, primaryTag, tagFor } from './locationCategories';
+import { categoryLine, LOCATION_CATEGORY_META, primaryTag, tagFor } from './locationCategories';
 
 export interface HallMenuSummary {
   mealPeriod: MealPeriod;
@@ -35,8 +35,8 @@ interface HallCardProps {
 export function HallCard({ hall, summary, compact, category }: HallCardProps) {
   const status = getOpenStatus(hall.todayHours);
   const lead = (category && tagFor(hall, category)) ?? primaryTag(hall);
-  const others = hall.categories.filter((t) => t.category !== lead.category);
   const KindIcon = LOCATION_CATEGORY_META[lead.category].icon;
+  const line = categoryLine(hall, category);
 
   return (
     <article
@@ -81,19 +81,7 @@ export function HallCard({ hall, summary, compact, category }: HallCardProps) {
             )}
             <span className="text-ink-2">· {status.label}</span>
           </p>
-          <ul aria-label="Categories" className="m-0 mt-1 flex list-none flex-wrap gap-1.5 p-0">
-            <li className="rounded-full border border-line-strong px-2 py-0.5 text-caption font-bold text-ink-2">
-              {lead.label}
-            </li>
-            {others.map((t) => (
-              <li
-                key={t.category}
-                className="rounded-full bg-canvas px-2 py-0.5 text-caption font-semibold text-ink-2"
-              >
-                {LOCATION_CATEGORY_META[t.category].short}
-              </li>
-            ))}
-          </ul>
+          {line && <p className="m-0 text-sm text-ink-3">{line}</p>}
         </div>
         <FavoriteButton
           kind="hall"
