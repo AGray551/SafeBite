@@ -3,7 +3,7 @@ import { useState, type ReactNode } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router';
 import diningHallPhoto from '@/assets/welcome-dining-hall.webp';
 import { Button, ButtonLink } from '@/components/ui/Button';
-import { LogoMark, Wordmark } from '@/components/ui/Logo';
+import { LogoMark, WordmarkWithSlogan } from '@/components/ui/Logo';
 import { AllergenChip } from '@/features/safety/AllergenChip';
 import { SafetyBadge } from '@/features/safety/SafetyBadge';
 import type { SafetyStatus } from '@/features/safety/assess';
@@ -97,7 +97,7 @@ export function WelcomePage() {
         <div className="flex items-center justify-between gap-3">
           <h1 className="flex items-center gap-2 text-[1.625rem] leading-none">
             <LogoMark className="size-10 shrink-0 text-ink" />
-            <Wordmark />
+            <WordmarkWithSlogan />
           </h1>
           <Link to="/sign-in" className="flex min-h-11 items-center px-1 text-label font-bold">
             Sign in

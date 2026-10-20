@@ -4,9 +4,8 @@ import { useSearchParams } from 'react-router';
 import { useHalls, useItemSearch } from '@/api/queries';
 import { MEAL_PERIODS, type MealPeriod } from '@/api/schemas';
 import { Page, PageIntro } from '@/components/layout/Page';
-import { Chip, ChipRow } from '@/components/ui/Chip';
+import { FilterGroup, FilterMenu, FilterOption } from '@/components/ui/FilterMenu';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/QueryState';
-import { Switch } from '@/components/ui/Switch';
 import {
   matchesQuickFilters,
   QUICK_FILTERS,
@@ -74,6 +73,15 @@ export function SearchPage() {
 
   const hasQuery = q.trim().length > 0;
 
+  // "Filters · n" counts what's narrowing results: the on-by-default
+  // Open now and Safe for Me included, so it's clear why things are hidden.
+  const activeCount = Number(openOnly) + Number(safeOnly && Boolean(profile)) + filters.size;
+  const resetFilters = () => {
+    setOpenOnly(false);
+    setSafeOnly(false);
+    setFilters(new Set());
+  };
+
   return (
     <>
       <PageIntro width="wide">
@@ -110,57 +118,78 @@ export function SearchPage() {
       </PageIntro>
 
       <Page width="wide">
-        {!hasQuery && (
-          <section aria-labelledby="try-heading" className="flex flex-col gap-2">
-            <h2 id="try-heading" className="text-sm font-bold tracking-wide text-ink-3">
-              TRY
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {SUGGESTIONS.map((s) => (
-                <Chip key={s} active={false} onClick={() => setQuery(s)}>
-                  {s}
-                </Chip>
+        <div className="flex items-center justify-between gap-3">
+          {hasQuery && searchQuery.isSuccess ? (
+            <p className="m-0 text-sm text-ink-2" aria-live="polite">
+              <b>
+                {total} result{total === 1 ? '' : 's'}
+              </b>{' '}
+              across {hallCount} location{hallCount === 1 ? '' : 's'}
+              {hiddenAvoid > 0 && safeOnly && ` · ${hiddenAvoid} hidden by Safe for Me`}
+            </p>
+          ) : (
+            <p className="m-0 text-sm text-ink-3">
+              Try{' '}
+              {SUGGESTIONS.map((suggestion, i) => (
+                <span key={suggestion}>
+                  <button
+                    type="button"
+                    onClick={() => setQuery(suggestion)}
+                    className="font-bold text-ink-2 underline decoration-line-strong underline-offset-4 hover:text-ink"
+                  >
+                    {suggestion}
+                  </button>
+                  {i < SUGGESTIONS.length - 1 && ', '}
+                </span>
               ))}
-            </div>
-          </section>
-        )}
-
-        <ChipRow label="Search filters">
-          <Chip active={openOnly} onClick={() => setOpenOnly((v) => !v)}>
-            Open now
-          </Chip>
-          {QUICK_FILTERS.map((f) => (
-            <Chip
-              key={f.value}
-              active={filters.has(f.value)}
-              onClick={() => setFilters((current) => toggleInSet(current, f.value))}
-            >
-              {f.label}
-            </Chip>
-          ))}
-        </ChipRow>
-
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <label className="flex items-center gap-2 text-sm font-bold">
-            Meal
-            <select
-              value={mealPeriod}
-              onChange={(e) => setMealPeriod(e.target.value as MealPeriod)}
-              className="h-11 rounded-control border-[1.5px] border-line-strong bg-surface px-3 text-sm font-bold"
-            >
-              {MEAL_PERIODS.map((p) => (
-                <option key={p} value={p}>
-                  {MEAL_PERIOD_LABELS[p]}
-                </option>
-              ))}
-            </select>
-          </label>
-          {profile && (
-            <div className="flex items-center gap-2 text-sm font-bold">
-              <span aria-hidden>Safe for Me</span>
-              <Switch checked={safeOnly} onChange={setSafeOnly} label="Safe for Me filter" />
-            </div>
+            </p>
           )}
+
+          <FilterMenu activeCount={activeCount} onReset={resetFilters}>
+            <FilterGroup legend="Show">
+              <FilterOption
+                type="checkbox"
+                checked={openOnly}
+                onChange={() => setOpenOnly((v) => !v)}
+              >
+                Open now
+              </FilterOption>
+              {profile && (
+                <FilterOption
+                  type="checkbox"
+                  checked={safeOnly}
+                  onChange={() => setSafeOnly((v) => !v)}
+                >
+                  Safe for Me
+                </FilterOption>
+              )}
+            </FilterGroup>
+            <FilterGroup legend="Meal">
+              {MEAL_PERIODS.map((p) => (
+                <FilterOption
+                  key={p}
+                  type="radio"
+                  name="meal"
+                  checked={mealPeriod === p}
+                  onChange={() => setMealPeriod(p)}
+                >
+                  {MEAL_PERIOD_LABELS[p]}
+                </FilterOption>
+              ))}
+            </FilterGroup>
+            <FilterGroup legend="Diet">
+              {QUICK_FILTERS.map((f) => (
+                <FilterOption
+                  key={f.value}
+                  type="checkbox"
+                  checked={filters.has(f.value)}
+                  onChange={() => setFilters((current) => toggleInSet(current, f.value))}
+                >
+                  {f.label}
+                </FilterOption>
+              ))}
+            </FilterGroup>
+          </FilterMenu>
         </div>
 
         {hasQuery && searchQuery.isLoading && <LoadingState label="Searching…" />}
@@ -170,14 +199,6 @@ export function SearchPage() {
 
         {hasQuery && searchQuery.isSuccess && (
           <>
-            <p className="m-0 text-sm text-ink-2" aria-live="polite">
-              <b>
-                {total} result{total === 1 ? '' : 's'}
-              </b>{' '}
-              across {hallCount} location{hallCount === 1 ? '' : 's'}
-              {hiddenAvoid > 0 && safeOnly && ` · ${hiddenAvoid} hidden by Safe for Me`}
-            </p>
-
             {groups.length === 0 ? (
               <EmptyState icon={<Search size={28} />} title={`No results for "${q}"`}>
                 Try another word, a different meal, or turn off "Open now".

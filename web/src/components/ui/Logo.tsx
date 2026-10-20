@@ -62,3 +62,16 @@ export function Wordmark({ className }: { className?: string }) {
     </span>
   );
 }
+
+/** The short slogan shown under the wordmark. */
+export const SLOGAN = 'Eat safe at UC';
+
+/** Wordmark with the slogan underneath, for the nav and welcome screen. */
+export function WordmarkWithSlogan({ className }: { className?: string }) {
+  return (
+    <span className="flex flex-col">
+      <Wordmark className={cn('leading-none', className)} />
+      <span className="mt-1 text-xs leading-none font-semibold text-ink-3">{SLOGAN}</span>
+    </span>
+  );
+}

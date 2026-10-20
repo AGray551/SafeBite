@@ -1,10 +1,9 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import { useHalls } from '@/api/queries';
 import type { DiningHall, LocationCategory } from '@/api/schemas';
 import { Page } from '@/components/layout/Page';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/QueryState';
-import { Switch } from '@/components/ui/Switch';
-import { cn } from '@/lib/cn';
+import { FilterGroup, FilterMenu, FilterOption } from '@/components/ui/FilterMenu';
 import { getOpenStatus } from '@/lib/time';
 import { DiningHeader } from './DiningHeader';
 import { HallCard, type HallMenuSummary } from './HallCard';
@@ -33,7 +32,7 @@ export function DiningListPage() {
   const halls = useMemo(() => hallsQuery.data ?? [], [hallsQuery.data]);
   const openCount = halls.filter((h) => getOpenStatus(h.todayHours).isOpen).length;
 
-  // Every category that has locations, for the chips (counts ignore "Open now").
+  // Every category that has locations, for the menu (counts ignore "Open now").
   const allSections = useMemo(() => groupByCategory(halls), [halls]);
 
   const sections = useMemo(() => {
@@ -44,6 +43,13 @@ export function DiningListPage() {
     );
   }, [halls, openOnly, category, sort, summaries]);
 
+  // Sort order isn't a filter, so it doesn't count toward "Filters · n".
+  const activeCount = Number(category !== 'all') + Number(openOnly);
+  const resetFilters = () => {
+    setCategory('all');
+    setOpenOnly(false);
+  };
+
   // Locations shown, counted once even if they're in several sections.
   const shownCount = new Set(sections.flatMap((s) => s.halls.map((h) => h.id))).size;
 
@@ -51,55 +57,83 @@ export function DiningListPage() {
     <>
       <DiningHeader view="list" />
       <Page width="wide">
-        <div className="-mx-4 border-b border-line md:mx-0">
-          <div
-            role="group"
-            aria-label="Category"
-            className="no-scrollbar flex gap-1 overflow-x-auto px-2 md:px-0"
-          >
-            <CategoryTab active={category === 'all'} onClick={() => setCategory('all')}>
-              All
-            </CategoryTab>
-            {allSections.map(({ category: c, halls: inCategory }) => (
-              <CategoryTab key={c} active={category === c} onClick={() => setCategory(c)}>
-                {LOCATION_CATEGORY_META[c].title}
-                <span className="font-semibold text-ink-3">{inCategory.length}</span>
-              </CategoryTab>
-            ))}
-          </div>
-        </div>
-
         {hallsQuery.isLoading && <LoadingState />}
         {hallsQuery.isError && <ErrorState onRetry={() => void hallsQuery.refetch()} />}
 
         {hallsQuery.isSuccess && (
           <>
-            <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2">
+            <div className="flex items-center justify-between gap-3">
               <p className="m-0 text-sm text-ink-2" aria-live="polite">
                 <b>
                   {shownCount} location{shownCount === 1 ? '' : 's'}
-                </b>{' '}
-                · {openCount} open now
+                </b>
+                {category !== 'all' && ` in ${LOCATION_CATEGORY_META[category].title}`} ·{' '}
+                {openCount} open now
+                {activeCount > 0 && (
+                  <>
+                    {' · '}
+                    <button
+                      type="button"
+                      onClick={resetFilters}
+                      className="font-bold text-brand hover:text-brand-hover"
+                    >
+                      Clear
+                    </button>
+                  </>
+                )}
               </p>
-              <div className="flex items-center gap-5">
-                <div className="flex items-center gap-2">
-                  <span aria-hidden className="text-sm font-bold text-ink-2">
-                    Open now
-                  </span>
-                  <Switch label="Open now" checked={openOnly} onChange={setOpenOnly} />
-                </div>
-                <label className="flex items-center gap-2 text-sm font-bold text-ink-2">
-                  Sort
-                  <select
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value as SortKey)}
-                    className="h-11 rounded-control border-[1.5px] border-line-strong bg-surface px-3 text-sm font-bold text-ink"
+              <FilterMenu activeCount={activeCount} onReset={resetFilters}>
+                <FilterGroup legend="Category">
+                  <FilterOption
+                    type="radio"
+                    name="category"
+                    checked={category === 'all'}
+                    onChange={() => setCategory('all')}
+                    detail={halls.length}
                   >
-                    <option value="most-safe">Most safe items</option>
-                    <option value="name">A–Z</option>
-                  </select>
-                </label>
-              </div>
+                    All locations
+                  </FilterOption>
+                  {allSections.map(({ category: c, halls: inCategory }) => (
+                    <FilterOption
+                      key={c}
+                      type="radio"
+                      name="category"
+                      checked={category === c}
+                      onChange={() => setCategory(c)}
+                      detail={inCategory.length}
+                    >
+                      {LOCATION_CATEGORY_META[c].title}
+                    </FilterOption>
+                  ))}
+                </FilterGroup>
+                <FilterGroup legend="Show">
+                  <FilterOption
+                    type="checkbox"
+                    checked={openOnly}
+                    onChange={() => setOpenOnly((v) => !v)}
+                  >
+                    Open now
+                  </FilterOption>
+                </FilterGroup>
+                <FilterGroup legend="Sort by">
+                  <FilterOption
+                    type="radio"
+                    name="sort"
+                    checked={sort === 'most-safe'}
+                    onChange={() => setSort('most-safe')}
+                  >
+                    Most safe items
+                  </FilterOption>
+                  <FilterOption
+                    type="radio"
+                    name="sort"
+                    checked={sort === 'name'}
+                    onChange={() => setSort('name')}
+                  >
+                    Name (A–Z)
+                  </FilterOption>
+                </FilterGroup>
+              </FilterMenu>
             </div>
             {sections.length === 0 ? (
               <EmptyState title="No matching locations are open right now">
@@ -150,36 +184,5 @@ export function DiningListPage() {
         )}
       </Page>
     </>
-  );
-}
-
-/**
- * Text tab for picking a category. The active tab is bold with an underline
- * bar (not color alone) and is exposed with aria-pressed.
- */
-function CategoryTab({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={cn(
-        'relative flex h-12 shrink-0 items-center gap-1.5 px-3 text-label whitespace-nowrap',
-        'after:absolute after:inset-x-2 after:bottom-0 after:h-[3px] after:rounded-full',
-        active
-          ? 'font-extrabold text-ink after:bg-brand'
-          : 'font-semibold text-ink-2 hover:text-ink',
-      )}
-    >
-      {children}
-    </button>
   );
 }
