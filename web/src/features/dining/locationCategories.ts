@@ -69,3 +69,22 @@ export function groupByCategory(halls: DiningHall[], only?: LocationCategory): C
     }))
     .filter((section) => section.halls.length > 0);
 }
+
+/**
+ * A short line describing a location within a category section, e.g.
+ * "Signature Meal Exchange · Also food court". The classification is left out
+ * when it only repeats the section ("Residential Dining" under Dining halls).
+ */
+export function categoryLine(hall: DiningHall, category?: LocationCategory): string {
+  const lead = (category && tagFor(hall, category)) ?? primaryTag(hall);
+  const meta = LOCATION_CATEGORY_META[lead.category];
+  const repeatsSection =
+    lead.category === 'dining-hall' || lead.label.toLowerCase() === meta.short.toLowerCase();
+  const others = hall.categories
+    .filter((t) => t.category !== lead.category)
+    .map((t) => LOCATION_CATEGORY_META[t.category].short.toLowerCase());
+
+  return [!repeatsSection && lead.label, others.length > 0 && `Also ${others.join(', ')}`]
+    .filter(Boolean)
+    .join(' · ');
+}

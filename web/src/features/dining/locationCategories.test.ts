@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HALLS } from '@/api/mock/fixtures';
-import { groupByCategory, primaryTag, tagFor } from './locationCategories';
+import { categoryLine, groupByCategory, primaryTag, tagFor } from './locationCategories';
 
 const names = (category: Parameters<typeof groupByCategory>[1]) =>
   groupByCategory(HALLS, category)[0]!
@@ -66,5 +66,27 @@ describe('sample locations', () => {
 
   it('has the convenience and grab-and-go stops', () => {
     expect(names('convenience')).toEqual(['Blue Ash Café', 'DAAP Café', 'MainStreet ExpressMart']);
+  });
+});
+
+describe('categoryLine', () => {
+  const hall = (id: string) => HALLS.find((h) => h.id === id)!;
+
+  it("leads with the section's classification and lists the other categories", () => {
+    expect(categoryLine(hall('halal-shack'), 'meal-exchange')).toBe(
+      'Signature Meal Exchange · Also food court',
+    );
+    expect(categoryLine(hall('halal-shack'), 'retail')).toBe(
+      'Mediterranean / Halal · Also meal exchange',
+    );
+  });
+
+  it('leaves out a classification that only repeats the section', () => {
+    expect(categoryLine(hall('centercourt'), 'dining-hall')).toBe('');
+    expect(categoryLine(hall('campus-view-cafe'), 'meal-exchange')).toBe('Also café');
+  });
+
+  it('uses the main category when no section is given', () => {
+    expect(categoryLine(hall('chick-fil-a'))).toBe('Fast Food');
   });
 });
