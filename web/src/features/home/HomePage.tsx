@@ -9,7 +9,8 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/ui/QueryState
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import type { HallMenuSummary } from '@/features/dining/HallCard';
 import { SafeCount } from '@/features/dining/HallCard';
-import { HallBrandMark, hasHallBrandMark } from '@/features/dining/hallBranding';
+import { HallBrandMark } from '@/features/dining/hallBranding';
+import { hasHallBrandMark } from '@/features/dining/hallLogos';
 import { useHallSummaries } from '@/features/dining/useHallSummaries';
 import { describeProfile } from '@/features/safety/assess';
 import { useSafety } from '@/features/safety/useSafety';

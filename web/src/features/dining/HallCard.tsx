@@ -6,7 +6,8 @@ import { cn } from '@/lib/cn';
 import { MEAL_PERIOD_LABELS, safeItemsLabel } from '@/lib/labels';
 import { formatHours, getOpenStatus } from '@/lib/time';
 import { categoryLine, LOCATION_CATEGORY_META, primaryTag, tagFor } from './locationCategories';
-import { HallBrandMark, hasHallBrandMark } from './hallBranding';
+import { HallBrandMark } from './hallBranding';
+import { hasHallBrandMark } from './hallLogos';
 
 export interface HallMenuSummary {
   mealPeriod: MealPeriod;

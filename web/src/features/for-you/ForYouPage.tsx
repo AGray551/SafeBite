@@ -30,7 +30,7 @@ export function ForYouPage() {
   const hallsQuery = useHalls();
   const { menus, menusQuery } = useHallSummaries(mealPeriod);
   const { profile, assess, isLoading: profileLoading } = useSafety();
-  const halls = hallsQuery.data ?? [];
+  const halls = useMemo(() => hallsQuery.data ?? [], [hallsQuery.data]);
 
   const safeByHall = useMemo(() => {
     if (!profile) return [];
