@@ -51,8 +51,8 @@ npm install
 
 ## 4. Check it works
 
-1. Choose **Get Started** and create an account with your real email.
-2. Open the confirmation email **in the same browser** and click the link. You land on dietary profile setup.
+1. Choose **Get Started** and enter your real email.
+2. Enter the six-digit code from the email. You land on dietary profile setup.
 3. Save a profile. In the dashboard's **Table Editor → dietary_profiles**, there's now a row with your user id.
 
 For sign-in problems, see [Troubleshooting](supabase-setup.md#troubleshooting).
@@ -70,7 +70,7 @@ For sign-in problems, see [Troubleshooting](supabase-setup.md#troubleshooting).
 
 ## Sign-in settings
 
-Locally, sign-up works without changing any Supabase settings. Supabase accepts a confirmation link that returns to the same host name as the project's **Site URL**, and a new project's Site URL is `http://localhost:3000`, so `localhost` is already allowed.
+Supabase's OTP flow works locally after you enable Email and configure its Magic Link email template to include `{{ .Token }}`. An optional magic-link fallback still needs an allowed redirect URL.
 
 It's still worth pointing the Site URL at the app, because Supabase falls back to it whenever a link has no valid return address. In **Authentication → URL Configuration** (once, for everyone):
 

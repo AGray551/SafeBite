@@ -21,9 +21,9 @@ An overview of the whole system: what runs where, how data flows, and where to f
 | Piece                  | Status   | What it does                                                                                   |
 | ---------------------- | -------- | ---------------------------------------------------------------------------------------------- |
 | Web app (`web/`)       | Built    | Every screen students use. Runs entirely in the browser.                                       |
-| Supabase (`supabase/`) | Built    | Student accounts (email + password) and each student's dietary profile, favorites and reports. |
-| Sample data            | Built    | Dining halls, menus and items in `web/src/api/mock/fixtures.ts`, used until real menus exist.  |
-| Menu scraper           | Planned  | Collects UC Dining menus, ingredients, allergens and nutrition on a schedule.                  |
+| Supabase (`supabase/`) | Built    | Student accounts (email code), profiles, favorites, reports, immutable dining snapshots and alerts. |
+| Sample data            | Built    | Generated UC Dining fixture in `web/src/api/mock/realFixtures.ts`; regenerate it with `node scripts/generate-mock-fixtures.mjs` after replacing the checked-in export. |
+| Menu importer/collector | Ready for implementation | Loads the supplied seed export now; later collects UC Dining menus on a schedule. |
 | REST API               | Optional | The contract in [web/README.md](../web/README.md). Not needed if menus also go into Supabase.  |
 
 ## The web app
@@ -43,8 +43,9 @@ Routes are in `web/src/app/router.tsx`, and each screen is lazy-loaded into its 
 | Route                                              | Screen                                                             | Needs sign-in or guest mode |
 | -------------------------------------------------- | ------------------------------------------------------------------ | --------------------------- |
 | `/welcome`                                         | Welcome story and sign-up choices                                  | No                          |
-| `/sign-in` (`?mode=create`)                        | Sign in / create account                                           | No                          |
-| `/auth/callback`                                   | Where the email confirmation link lands                            | No                          |
+| `/sign-in`                                         | Request a one-time email code                                      | No                          |
+| `/verify-email`                                    | Enter the six-digit email code                                     | No                          |
+| `/auth/callback`, `/auth/error`                    | Magic-link fallback and expired-link recovery                      | No                          |
 | `/onboarding/allergies`, `severity`, `preferences` | Dietary profile setup                                              | Yes                         |
 | `/`                                                | Home                                                               | Yes                         |
 | `/dining`, `/dining/map`, `/dining/:hallId`        | Dining locations (list and map) and a hall's menu                  | Yes                         |

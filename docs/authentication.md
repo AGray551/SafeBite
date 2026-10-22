@@ -1,66 +1,47 @@
 # Authentication
 
-How students sign in, and how the web app keeps track of who is signed in.
+SafeBite uses Supabase email OTP authentication. Students enter their university email, receive a six-digit code, and verify it in the app—there are no SafeBite passwords to create, reset, or store.
 
 ## Ways to use SafeBite
 
-| Mode    | How                              | Where the dietary profile and favorites live        |
-| ------- | -------------------------------- | --------------------------------------------------- |
-| Account | Email + password (Supabase Auth) | Supabase, so they follow the student across devices |
-| Guest   | "Continue without an account"    | This browser only (localStorage)                    |
+| Mode | How | Where dietary profile and favorites live |
+| --- | --- | --- |
+| Account | Email code through Supabase Auth | The backend/Supabase database, tied to the student's user ID |
+| Guest | “Continue without an account” | This browser only |
 
-Without Supabase configured (no `VITE_SUPABASE_URL`), accounts also come from the in-browser mock, which accepts any email and password. That keeps the app usable for UI work with no setup.
+When Supabase is not configured and the mock API is active, enter any valid email and `123456` to exercise the UI. A real REST API without Supabase configuration intentionally rejects code sign-in.
 
-## Flows
+## Email-code flow
 
-### Create an account
+1. `/sign-in` validates an email address and calls `supabase.auth.signInWithOtp` with `shouldCreateUser: true`.
+2. Supabase sends an email using the Magic Link template configured with `{{ .Token }}`. This makes the message contain a code, not a clickable link.
+3. `/verify-email` accepts the six-digit code, supports resend after 60 seconds, and calls `supabase.auth.verifyOtp({ email, token, type: 'email' })`.
+4. `AuthProvider` receives the session, caches the user's app-shaped session, and stores the access token for the REST client to forward as `Authorization: Bearer <token>`.
+5. `/auth/callback` remains as a safe magic-link fallback. It resolves an incoming session, then takes a student with no saved profile to onboarding; `/auth/error` handles an expired or invalid link.
 
-1. The student enters name, email and password (at least 8 characters) on `/sign-in?mode=create`.
-2. The app calls Supabase `signUp`, storing the name in the account's metadata.
-3. With **Confirm email** on (the default), Supabase emails a confirmation link and the page shows **Check your email**.
-4. The link opens `/auth/callback?code=…`. The Supabase client exchanges the code for a session (PKCE flow), and the page sends the student to dietary profile setup.
+Do not use the user-editable `user_metadata` for authorization. The display name is only a UI fallback; database access is always based on `auth.uid()` / the verified JWT subject.
 
-The PKCE code only works in the browser where the student signed up. If they open the link somewhere else, the email still gets confirmed; the page tells them to sign in with their password instead.
+## Session behavior
 
-With **Confirm email** off, step 3 is skipped and the student goes straight to profile setup.
-
-### Sign in
-
-`signInWithPassword`. A student who already has a dietary profile goes back where they were headed (or Home); one without a profile goes to profile setup.
-
-### Sign out
-
-Signs out this browser only (`scope: 'local'`); other devices stay signed in. Cached profile, favorites and alerts are cleared.
-
-## Sessions
-
-The Supabase client stores the session in localStorage and refreshes the access token before it expires. The app follows every change through `api.auth.onSessionChange`:
-
-- a confirmation link signing the student in,
-- token refreshes,
-- signing in or out in another tab.
-
-When the signed-in user changes, `AuthProvider` refetches the profile, favorites and alerts so one student never sees another's data.
+The Supabase client restores and refreshes its browser session. `AuthProvider` subscribes to every auth-state change, clears user-specific caches on sign-out, and invalidates profile, favorites, and alerts when the signed-in student changes.
 
 ## Where the code is
 
-| File                                         | What it does                                                                  |
-| -------------------------------------------- | ----------------------------------------------------------------------------- |
-| `web/src/api/client.ts`                      | The `auth` part of the `SafeBiteApi` contract every implementation follows    |
-| `web/src/api/supabase/supabaseClient.ts`     | Supabase implementation: sign-in, sign-up, sessions, and per-student data     |
-| `web/src/api/supabase/rows.ts`               | Converts Supabase sessions and rows into the app's types (validated with zod) |
-| `web/src/api/index.ts`                       | Picks Supabase, the mock or the REST API from environment variables           |
-| `web/src/features/auth/AuthProvider.tsx`     | Holds the session for the whole app, listens for session changes, guest mode  |
-| `web/src/features/auth/SignInPage.tsx`       | Sign in / create account form and the "Check your email" state                |
-| `web/src/features/auth/AuthCallbackPage.tsx` | `/auth/callback`: where the confirmation link lands                           |
+| File | Responsibility |
+| --- | --- |
+| `web/src/lib/supabase.ts` | Creates the browser client, maps sessions, and makes the access token available to the REST client. |
+| `web/src/features/auth/AuthProvider.tsx` | Session lifecycle, guest state, sending/verifying email codes. |
+| `web/src/features/auth/SignInPage.tsx` | Request a code. |
+| `web/src/features/auth/VerifyEmailPage.tsx` | Verify a code and resend it. |
+| `web/src/features/auth/AuthCallbackPage.tsx` | Optional magic-link callback and post-auth routing. |
+| `web/src/features/auth/AuthErrorPage.tsx` | Expired/invalid link recovery. |
 
-## Security notes
+## Backend responsibility
 
-- The browser only ever holds the **publishable** key. What a student can read or change is enforced by row level security in the database ([rls.md](rls.md)), not by the app.
-- If the REST backend is built later, it receives the student's Supabase access token as `Authorization: Bearer <token>` and verifies it with the project's JWT keys instead of running its own sign-in.
+The browser never gets a secret/service-role key. Each authenticated API request includes the Supabase access token. The backend must verify that JWT against the project's current signing keys/JWKS and use its `sub` claim as the user ID; it must not accept a user ID supplied in a JSON body.
 
 ## Not built yet
 
-- **Password reset.** Supabase supports it (`resetPasswordForEmail`), but the app needs a "set a new password" screen. "Forgot password?" still says it's unavailable.
-- **Admin / staff roles.** Out of scope for v1.
-- **Moving guest data into a new account.** A guest who creates an account starts with an empty profile.
+- Migration of guest-local data into a newly signed-in account.
+- Admin/staff roles.
+- A university-domain allowlist. If required, enforce it server-side or with Supabase Auth hooks; client-side email validation is not access control.

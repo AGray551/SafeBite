@@ -1,6 +1,16 @@
 import { createContext, useContext } from 'react';
-import type { SignInInput, SignUpInput } from '@/api';
 import type { Session, User } from '@/api/schemas';
+
+/** Which flow an email code belongs to. */
+export type AuthMode = 'sign-in' | 'sign-up';
+
+export interface SendEmailCodeOptions {
+  /** "sign-in" refuses unknown emails; "sign-up" creates the account. */
+  mode: AuthMode;
+  /** Saved on a new account. */
+  firstName?: string;
+  lastName?: string;
+}
 
 export interface AuthContextValue {
   session: Session | null;
@@ -11,9 +21,12 @@ export interface AuthContextValue {
   hasEntered: boolean;
   isLoading: boolean;
   continueAsGuest: () => void;
-  signIn: (input: SignInInput) => Promise<Session>;
-  /** Null when the student has to confirm their email before signing in. */
-  signUp: (input: SignUpInput) => Promise<Session | null>;
+  sendEmailCode: (email: string, options?: SendEmailCodeOptions) => Promise<void>;
+  verifyEmailCode: (
+    email: string,
+    code: string,
+    options?: SendEmailCodeOptions,
+  ) => Promise<Session>;
   signOut: () => Promise<void>;
 }
 

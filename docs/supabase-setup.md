@@ -45,8 +45,9 @@ The link in the confirmation email opens `/auth/callback`. Supabase only sends s
 
 In **Authentication → Sign In / Providers → Email**:
 
-- Keep **Confirm email** on. New students get an email with a link that opens `/auth/callback` and signs them in.
-- Set **Minimum password length** to **8** to match the sign-up form.
+- Keep Email enabled. SafeBite calls `signInWithOtp` and allows Supabase to create a first-time student after they verify their email code.
+- In the **Magic Link** email template, use `{{ .Token }}` in the body. That sends the six-digit code used by `/verify-email`; `{{ .ConfirmationURL }}` would instead send a link.
+- Keep the OTP expiration short. Supabase throttles repeat requests by default; the UI also makes students wait 60 seconds before resend.
 
 Supabase's built-in email sender only sends a few emails per hour and is meant for testing. Before a demo with many sign-ups, either add your own SMTP server (**Authentication → Emails → SMTP Settings**) or turn **Confirm email** off.
 
@@ -73,9 +74,9 @@ Follow [local-setup.md](local-setup.md), the same steps every teammate uses. Its
 | Problem                                          | Fix                                                                                                                            |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
 | The app still behaves like the mock              | Check both variables are in `web/.env.local`, `VITE_USE_MOCK_API` isn't `true`, and you restarted `npm run dev`.               |
-| "That email and password don't match"            | Wrong password, or the account doesn't exist yet in this Supabase project.                                                     |
-| "Confirm your email first"                       | Open the link in the confirmation email. Signing up again with the same email resends it.                                      |
-| Confirmation link says "We couldn't sign you in" | The link was opened in a different browser, or it expired. The email is still confirmed: sign in with your email and password. |
+| "Email sign-in requires Supabase to be configured" | Add both browser environment values and restart Vite. |
+| The code is invalid or expired | Request another code. Codes are single-use and expire according to the Email OTP setting. |
+| No code arrives | Check spam. The built-in sender is rate-limited; use custom SMTP before a demo with many sign-ins. |
 | Link goes to the wrong site or `localhost:3000`  | Fix **Site URL** and **Redirect URLs** (step 2).                                                                               |
 | No confirmation email arrives                    | Check spam. The built-in sender is rate-limited; use custom SMTP or turn off **Confirm email** for testing.                    |
 | Saving the profile fails with a permission error | The migrations didn't run, or ran only partly. Re-run step 1.                                                                  |
