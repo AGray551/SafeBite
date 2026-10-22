@@ -16,6 +16,7 @@ import { isSafeForMe, type SafetyAssessment } from '@/features/safety/assess';
 import { FreshnessNote } from '@/features/safety/FreshnessNote';
 import { SafetyBanner } from '@/features/safety/SafetyBanner';
 import { useSafety } from '@/features/safety/useSafety';
+import { BalancedChoiceSnapshot } from '@/features/nutrition/BalancedChoiceSnapshot';
 import { cn } from '@/lib/cn';
 import { allergenNoun, DIETARY_TAG_LABELS, joinList } from '@/lib/labels';
 import { currentMealPeriod, formatUpdatedAt, toDateKey } from '@/lib/time';
@@ -188,6 +189,7 @@ function ItemDetail({ item }: { item: MenuItem }) {
         </Section>
 
         <Section title="Nutrition facts">
+          <BalancedChoiceSnapshot nutrition={item.nutrition} />
           <NutritionTable item={item} />
         </Section>
 
@@ -372,6 +374,8 @@ function NutritionTable({ item }: { item: MenuItem }) {
     ['Protein', nutrition.proteinG != null ? `${nutrition.proteinG} g` : undefined],
     ['Carbohydrates', nutrition.carbsG != null ? `${nutrition.carbsG} g` : undefined],
     ['Fat', nutrition.fatG != null ? `${nutrition.fatG} g` : undefined],
+    ['Saturated fat', nutrition.saturatedFatG != null ? `${nutrition.saturatedFatG} g` : undefined],
+    ['Fiber', nutrition.fiberG != null ? `${nutrition.fiberG} g` : undefined],
     ['Sodium', nutrition.sodiumMg != null ? `${nutrition.sodiumMg} mg` : undefined],
     ['Sugar', nutrition.sugarG != null ? `${nutrition.sugarG} g` : undefined],
   ];

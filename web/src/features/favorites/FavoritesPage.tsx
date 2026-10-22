@@ -32,10 +32,10 @@ export function FavoritesPage() {
   return (
     <>
       <PageIntro width="wide">
-        <h1 className="text-2xl">Favorites</h1>
+        <h1 className="text-2xl">Saved</h1>
         <SegmentedControl<Tab>
           as="tabs"
-          label="Favorites"
+          label="Saved items"
           className="md:max-w-sm"
           value={tab}
           onChange={setTab}

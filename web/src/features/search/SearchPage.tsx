@@ -58,7 +58,11 @@ export function SearchPage() {
       .map((item) => ({ item, assessment: assess(item) }));
 
     const applySafe = safeOnly && Boolean(profile);
-    const visible = applySafe ? entries.filter((e) => isSafeForMe(e.assessment)) : entries;
+    const visible = applySafe
+      ? entries.filter(
+          (entry) => entry.assessment.status === 'safe' && isSafeForMe(entry.assessment),
+        )
+      : entries;
 
     return {
       groups: GROUP_ORDER.map((status) => ({
