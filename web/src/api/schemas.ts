@@ -126,8 +126,10 @@ export const nutritionSchema = z.object({
   proteinG: z.number().optional(),
   carbsG: z.number().optional(),
   fatG: z.number().optional(),
+  saturatedFatG: z.number().optional(),
   sodiumMg: z.number().optional(),
   sugarG: z.number().optional(),
+  fiberG: z.number().optional(),
 });
 export type Nutrition = z.infer<typeof nutritionSchema>;
 
