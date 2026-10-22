@@ -13,8 +13,8 @@ function renderWelcome(overrides: Partial<AuthContextValue> = {}) {
     hasEntered: false,
     isLoading: false,
     continueAsGuest: vi.fn(),
-    signIn: vi.fn(),
-    signUp: vi.fn(),
+    sendEmailCode: vi.fn(),
+    verifyEmailCode: vi.fn(),
     signOut: vi.fn(),
     ...overrides,
   };
@@ -40,10 +40,7 @@ describe('WelcomePage', () => {
     await userEvent.click(next);
 
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('recipe changes');
-    expect(screen.getByRole('link', { name: 'Get started' })).toHaveAttribute(
-      'href',
-      '/sign-in?mode=create',
-    );
+    expect(screen.getByRole('link', { name: 'Get started' })).toHaveAttribute('href', '/sign-up');
   });
 
   it('lets students skip straight to the end and continue as a guest', async () => {

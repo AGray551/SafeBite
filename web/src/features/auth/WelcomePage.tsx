@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowRight, TriangleAlert } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router';
-import diningHallPhoto from '@/assets/welcome-dining-hall.webp';
+import marketPointePhoto from '@/assets/marketpointe-dining-hall.jpg';
 import { Button, ButtonLink } from '@/components/ui/Button';
 import { LogoMark, WordmarkWithSlogan } from '@/components/ui/Logo';
 import { AllergenChip } from '@/features/safety/AllergenChip';
@@ -76,27 +76,28 @@ export function WelcomePage() {
       {/* The photo leads the story on phones and stays alongside it on wider screens. */}
       <div
         className={cn(
-          'relative h-60 overflow-hidden md:sticky md:top-0 md:block md:h-dvh',
+          'relative h-[22rem] overflow-hidden md:sticky md:top-0 md:block md:h-dvh',
           !isFirst && 'hidden',
         )}
       >
         <img
-          src={diningHallPhoto}
-          alt="Students eating together at tables in a busy, sunlit campus dining hall"
-          className="absolute inset-0 size-full object-cover"
+          src={marketPointePhoto}
+          alt="Students gathering at MarketPointe dining hall"
+          className="absolute inset-0 size-full object-cover object-[center_68%]"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
       </div>
 
       <main
         id="main"
         className={cn(
-          'mx-auto flex w-full max-w-md flex-col gap-6 px-6 pt-6 pb-6 md:min-h-dvh md:justify-center md:py-12',
-          isFirst ? 'min-h-[calc(100dvh-15rem)]' : 'min-h-dvh',
+          'mx-auto flex w-full max-w-xl flex-col gap-8 px-7 pt-7 pb-7 md:min-h-dvh md:justify-center md:px-10 md:py-12',
+          isFirst ? 'min-h-[calc(100dvh-22rem)]' : 'min-h-dvh',
         )}
       >
         <div className="flex items-center justify-between gap-3">
-          <h1 className="flex items-center gap-2 text-[1.625rem] leading-none">
-            <LogoMark className="size-10 shrink-0 text-ink" />
+          <h1 className="flex items-center gap-2.5 text-[1.875rem] leading-none">
+            <LogoMark className="size-12 shrink-0 text-ink" />
             <WordmarkWithSlogan />
           </h1>
           <Link to="/sign-in" className="flex min-h-11 items-center px-1 text-label font-bold">
@@ -107,20 +108,24 @@ export function WelcomePage() {
         <section
           aria-roledescription="carousel"
           aria-label="About SafeBite"
-          className="flex flex-col gap-5"
+          className="flex flex-col gap-7"
         >
           <div
             key={index}
             role="group"
             aria-roledescription="slide"
             aria-label={`${index + 1} of ${SLIDES.length}`}
-            className="flex animate-story-in flex-col gap-5"
+            className="flex animate-story-in flex-col gap-6"
           >
             {slide.visual && <div aria-hidden>{slide.visual}</div>}
-            <div className="flex flex-col gap-2.5">
-              <p className="m-0 text-sm font-bold text-brand">{slide.eyebrow}</p>
-              <h2 className="text-[1.75rem] leading-tight">{slide.title}</h2>
-              <p className="m-0 text-ink-2">{slide.body}</p>
+            <div className="flex flex-col gap-3">
+              <p className="m-0 text-sm font-extrabold tracking-[0.06em] text-brand uppercase">
+                {slide.eyebrow}
+              </p>
+              <h2 className="text-[2.25rem] leading-[1.08] tracking-tight md:text-[3.15rem]">
+                {slide.title}
+              </h2>
+              <p className="m-0 text-lg leading-relaxed text-ink-2 md:text-xl">{slide.body}</p>
             </div>
           </div>
 
@@ -150,10 +155,10 @@ export function WelcomePage() {
           </div>
         </section>
 
-        <div className="mt-auto flex flex-col gap-2.5 md:mt-2">
+        <div className="mt-auto flex flex-col gap-3 md:mt-3">
           {isLast ? (
             <>
-              <ButtonLink to="/sign-in?mode=create">Get started</ButtonLink>
+              <ButtonLink to="/sign-up">Get started</ButtonLink>
               <button
                 type="button"
                 onClick={handleGuest}
@@ -205,7 +210,7 @@ export function WelcomePage() {
 /** Small framed card used for the example UI on each slide. */
 function ExampleCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+    <div className="flex flex-col gap-3 rounded-[1.1rem] border border-line bg-surface p-5 shadow-[0_12px_32px_rgba(0,0,0,0.1)]">
       <p className="m-0 font-heading text-xs font-extrabold tracking-[0.08em] text-ink-3">
         {title}
       </p>

@@ -22,9 +22,18 @@ const routes: RouteObject[] = [
     children: [
       { path: 'welcome', lazy: page(() => import('@/features/auth/WelcomePage'), 'WelcomePage') },
       { path: 'sign-in', lazy: page(() => import('@/features/auth/SignInPage'), 'SignInPage') },
+      { path: 'sign-up', lazy: page(() => import('@/features/auth/SignUpPage'), 'SignUpPage') },
+      {
+        path: 'verify-email',
+        lazy: page(() => import('@/features/auth/VerifyEmailPage'), 'VerifyEmailPage'),
+      },
       {
         path: 'auth/callback',
         lazy: page(() => import('@/features/auth/AuthCallbackPage'), 'AuthCallbackPage'),
+      },
+      {
+        path: 'auth/error',
+        lazy: page(() => import('@/features/auth/AuthErrorPage'), 'AuthErrorPage'),
       },
 
       // Everything below requires being signed in or in guest mode.
@@ -68,6 +77,10 @@ const routes: RouteObject[] = [
               {
                 path: 'dining',
                 lazy: page(() => import('@/features/dining/DiningListPage'), 'DiningListPage'),
+              },
+              {
+                path: 'for-you',
+                lazy: page(() => import('@/features/for-you/ForYouPage'), 'ForYouPage'),
               },
               {
                 path: 'dining/map',
