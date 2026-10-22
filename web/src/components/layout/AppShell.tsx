@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, ScrollRestoration, useMatches } from 'react-router';
+import { Link, NavLink, Outlet, ScrollRestoration, useLocation, useMatches } from 'react-router';
 import { LogoMark, WordmarkWithSlogan } from '@/components/ui/Logo';
 import { cn } from '@/lib/cn';
 import { NAV_ITEMS } from './navItems';
@@ -16,6 +16,7 @@ export interface RouteHandle {
  */
 export function AppShell() {
   const matches = useMatches();
+  const location = useLocation();
   const hideNav = matches.some((match) => (match.handle as RouteHandle | undefined)?.hideNav);
 
   return (
@@ -28,23 +29,27 @@ export function AppShell() {
         Skip to content
       </a>
 
-      <DesktopNav />
+      <DesktopNav pathname={location.pathname} />
 
       <div className={cn('flex flex-1 flex-col', !hideNav && 'pb-[84px] md:pb-0')}>
         <Outlet />
       </div>
 
-      {!hideNav && <MobileNav />}
+      {!hideNav && <MobileNav pathname={location.pathname} />}
       <ScrollRestoration />
     </div>
   );
 }
 
-function MobileNav() {
+function isFoodFlow(pathname: string) {
+  return pathname === '/' || pathname.startsWith('/for-you') || pathname.startsWith('/search');
+}
+
+function MobileNav({ pathname }: { pathname: string }) {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-30 grid h-[84px] grid-cols-5 border-t border-line bg-surface px-1 pt-2 pb-[max(16px,env(safe-area-inset-bottom))] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 grid h-[84px] grid-cols-4 border-t border-line bg-surface px-2 pt-2 pb-[max(16px,env(safe-area-inset-bottom))] md:hidden"
     >
       {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
         <NavLink
@@ -54,30 +59,35 @@ function MobileNav() {
           className={({ isActive }) =>
             cn(
               'flex flex-col items-center justify-center gap-1 text-xs',
-              isActive ? 'font-extrabold text-brand' : 'font-semibold text-ink-3',
+              (to === '/' ? isFoodFlow(pathname) : isActive)
+                ? 'font-extrabold text-brand'
+                : 'font-semibold text-ink-3',
             )
           }
         >
-          {({ isActive }) => (
-            <>
-              <span
-                className={cn(
-                  'flex h-7.5 w-14 items-center justify-center rounded-full',
-                  isActive && 'bg-brand-tint',
-                )}
-              >
-                <Icon aria-hidden size={22} strokeWidth={isActive ? 2.4 : 2} />
-              </span>
-              {label}
-            </>
-          )}
+          {({ isActive }) => {
+            const active = to === '/' ? isFoodFlow(pathname) : isActive;
+            return (
+              <>
+                <span
+                  className={cn(
+                    'flex h-7.5 w-14 items-center justify-center rounded-full',
+                    active && 'bg-brand-tint',
+                  )}
+                >
+                  <Icon aria-hidden size={22} strokeWidth={active ? 2.4 : 2} />
+                </span>
+                {label}
+              </>
+            );
+          }}
         </NavLink>
       ))}
     </nav>
   );
 }
 
-function DesktopNav() {
+function DesktopNav({ pathname }: { pathname: string }) {
   return (
     <header className="sticky top-0 z-30 hidden border-b border-line bg-surface md:block">
       <div
@@ -96,7 +106,7 @@ function DesktopNav() {
               className={({ isActive }) =>
                 cn(
                   'flex h-11 items-center gap-2 rounded-full px-4 text-label',
-                  isActive
+                  (to === '/' ? isFoodFlow(pathname) : isActive)
                     ? 'bg-brand-tint font-extrabold text-brand'
                     : 'font-semibold text-ink-2 hover:bg-canvas hover:text-ink',
                 )
