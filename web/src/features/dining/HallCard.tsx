@@ -6,12 +6,16 @@ import { cn } from '@/lib/cn';
 import { MEAL_PERIOD_LABELS, safeItemsLabel } from '@/lib/labels';
 import { formatHours, getOpenStatus } from '@/lib/time';
 import { categoryLine, LOCATION_CATEGORY_META, primaryTag, tagFor } from './locationCategories';
+import { HallBrandMark, hasHallBrandMark } from './hallBranding';
 
 export interface HallMenuSummary {
   mealPeriod: MealPeriod;
   itemCount: number;
   /** Null when the student has no profile, so "safe" can't be computed. */
   safeCount: number | null;
+  /** Average SafeBite nutrition estimate across scoreable meal items. */
+  averageHealthScore: number | null;
+  scoredItemCount: number;
 }
 
 interface HallCardProps {
@@ -37,6 +41,7 @@ export function HallCard({ hall, summary, compact, category }: HallCardProps) {
   const lead = (category && tagFor(hall, category)) ?? primaryTag(hall);
   const KindIcon = LOCATION_CATEGORY_META[lead.category].icon;
   const line = categoryLine(hall, category);
+  const hasBrandMark = hasHallBrandMark(hall);
 
   return (
     <article
@@ -45,44 +50,21 @@ export function HallCard({ hall, summary, compact, category }: HallCardProps) {
         status.isOpen ? 'bg-surface' : 'border-dashed bg-surface-muted',
       )}
     >
-      <div className="flex items-start gap-3">
-        <span
-          aria-hidden
-          className={cn(
-            'flex size-11 shrink-0 items-center justify-center rounded-control',
-            status.isOpen ? 'bg-canvas text-ink-2' : 'bg-placeholder text-ink-3',
-          )}
-        >
-          <KindIcon size={22} />
-        </span>
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h3 className="text-lg leading-tight">
-            <Link
-              to={`/dining/${hall.id}`}
+      <div className="flex items-start justify-between gap-3">
+        <span className="min-w-0 flex-1" aria-hidden>
+          {hasBrandMark ? (
+            <HallBrandMark hall={hall} size="featured" />
+          ) : (
+            <span
               className={cn(
-                'after:absolute after:inset-0 after:rounded-card focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-brand',
-                status.isOpen ? 'text-ink hover:text-ink' : 'text-ink-2 hover:text-ink-2',
+                'flex size-16 items-center justify-center rounded-control',
+                status.isOpen ? 'bg-canvas text-ink-2' : 'bg-placeholder text-ink-3',
               )}
             >
-              {hall.name}
-            </Link>
-          </h3>
-          <p className="m-0 flex flex-wrap items-center gap-1.5 text-sm">
-            {status.isOpen ? (
-              <span className="inline-flex items-center gap-1 font-extrabold text-safe">
-                <Check aria-hidden size={16} strokeWidth={3} />
-                Open
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 font-extrabold text-ink-2">
-                <Moon aria-hidden size={16} />
-                Closed
-              </span>
-            )}
-            <span className="text-ink-2">· {status.label}</span>
-          </p>
-          {line && <p className="m-0 text-sm text-ink-3">{line}</p>}
-        </div>
+              <KindIcon size={28} />
+            </span>
+          )}
+        </span>
         <FavoriteButton
           kind="hall"
           id={hall.id}
@@ -90,12 +72,34 @@ export function HallCard({ hall, summary, compact, category }: HallCardProps) {
           className="relative z-10 -mt-2 -mr-2"
         />
       </div>
-
-      {hall.concepts && (
-        <p className="m-0 text-sm text-ink-2">
-          <b>Inside:</b> {hall.concepts.join(' · ')}
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <h3 className="text-lg leading-tight">
+          <Link
+            to={`/dining/${hall.id}`}
+            className={cn(
+              'after:absolute after:inset-0 after:rounded-card focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-2 focus-visible:after:outline-brand',
+              status.isOpen ? 'text-ink hover:text-ink' : 'text-ink-2 hover:text-ink-2',
+            )}
+          >
+            {hall.name}
+          </Link>
+        </h3>
+        <p className="m-0 flex flex-wrap items-center gap-1.5 text-sm">
+          {status.isOpen ? (
+            <span className="inline-flex items-center gap-1 font-extrabold text-safe">
+              <Check aria-hidden size={16} strokeWidth={3} />
+              Open
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 font-extrabold text-ink-2">
+              <Moon aria-hidden size={16} />
+              Closed
+            </span>
+          )}
+          <span className="text-ink-2">· {status.label}</span>
         </p>
-      )}
+        {line && <p className="m-0 text-sm text-ink-3">{line}</p>}
+      </div>
 
       <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-sm text-ink-2">
         <li className="flex items-center gap-1.5">

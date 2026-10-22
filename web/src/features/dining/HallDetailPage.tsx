@@ -1,13 +1,4 @@
-import {
-  ChevronDown,
-  Clock,
-  EyeOff,
-  MapPin,
-  Moon,
-  Navigation,
-  ShieldCheck,
-  Check,
-} from 'lucide-react';
+import { ChevronDown, Clock, EyeOff, MapPin, Moon, Navigation, Check } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { useHall, useMenu } from '@/api/queries';
@@ -15,7 +6,7 @@ import type { DiningHall, MealPeriod } from '@/api/schemas';
 import { Page } from '@/components/layout/Page';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
-import { Chip, ChipRow } from '@/components/ui/Chip';
+import { FilterGroup, FilterMenu, FilterOption } from '@/components/ui/FilterMenu';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/QueryState';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { FavoriteButton } from '@/features/favorites/FavoriteButton';
@@ -25,13 +16,15 @@ import {
   toggleInSet,
   type QuickFilter,
 } from '@/features/menu/filters';
-import { categoryAnchor, COMPACT_CATEGORIES, groupByCategory } from '@/features/menu/grouping';
+import { COMPACT_CATEGORIES, groupByCategory } from '@/features/menu/grouping';
+import { menuItemKind } from '@/features/menu/itemKind';
 import { MenuItemCard, MenuItemRow } from '@/features/menu/MenuItemCard';
 import { isSafeForMe } from '@/features/safety/assess';
 import { FreshnessNote } from '@/features/safety/FreshnessNote';
 import { useSafety } from '@/features/safety/useSafety';
 import { MEAL_PERIOD_LABELS } from '@/lib/labels';
 import { currentMealPeriod, formatHours, getOpenStatus, toDateKey } from '@/lib/time';
+import { HallBrandMark } from './hallBranding';
 
 /** Sections after this many start collapsed to keep the page scannable. */
 const EXPANDED_SECTIONS = 3;
@@ -81,60 +74,71 @@ function HallMenu({ hall }: { hall: DiningHall }) {
       .filter(({ item }) => matchesQuickFilters(item, filters));
     // "Safe for Me" only applies once the student has a profile.
     const applySafeFilter = safeOnly && profile && !showHidden;
-    const shown = applySafeFilter ? entries.filter((e) => isSafeForMe(e.assessment)) : entries;
+    const shown = applySafeFilter
+      ? entries.filter(
+          (entry) => entry.assessment.status === 'safe' && isSafeForMe(entry.assessment),
+        )
+      : entries;
     return { visible: shown, hiddenCount: entries.length - shown.length, total: entries.length };
   }, [menuQuery.data, assess, filters, safeOnly, profile, showHidden]);
 
-  const sections = groupByCategory(visible);
+  const mealEntries = visible.filter(({ item }) => menuItemKind(item) === 'meal');
+  const extraEntries = visible.filter(({ item }) => menuItemKind(item) === 'extra');
+  const sections = groupByCategory(mealEntries);
 
   // Use coordinates so directions land on the right building, not just the street.
   const directionsUrl = `https://www.google.com/maps/search/?api=1&query=${hall.coordinates.lat},${hall.coordinates.lng}`;
 
   return (
     <Page width="wide">
-      <section className="flex flex-col gap-2">
-        <h2 className="text-title">{hall.name}</h2>
-        <p className="m-0 text-label text-ink-2">
-          {hall.categories
-            .map((t) => (t.category === 'dining-hall' ? 'Residential dining hall' : t.label))
-            .join(' · ')}
-        </p>
-        <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-label text-ink-2">
-          <li className="flex items-center gap-1.5">
-            {status.isOpen ? (
-              <span className="inline-flex items-center gap-1 font-extrabold text-safe">
-                <Check aria-hidden size={16} strokeWidth={3} /> Open
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 font-extrabold">
-                <Moon aria-hidden size={16} /> Closed
-              </span>
-            )}
-            · {status.label}
-          </li>
-          {hall.todayHours && (
+      <section className="grid gap-4 md:grid-cols-[minmax(0,1fr)_16rem]">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <h2 className="text-title">{hall.name}</h2>
+          <p className="m-0 text-label text-ink-2">
+            {hall.categories
+              .map((t) => (t.category === 'dining-hall' ? 'Residential dining hall' : t.label))
+              .join(' · ')}
+          </p>
+          <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-label text-ink-2">
             <li className="flex items-center gap-1.5">
-              <Clock aria-hidden size={16} /> Today {formatHours(hall.todayHours)}
+              {status.isOpen ? (
+                <span className="inline-flex items-center gap-1 font-extrabold text-safe">
+                  <Check aria-hidden size={16} strokeWidth={3} /> Open
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 font-extrabold">
+                  <Moon aria-hidden size={16} /> Closed
+                </span>
+              )}
+              · {status.label}
             </li>
-          )}
-          <li className="flex items-start gap-1.5">
-            <MapPin aria-hidden size={16} className="mt-0.5 shrink-0" />
-            <span>
-              {hall.location}
-              {hall.address && <span className="block text-sm text-ink-3">{hall.address}</span>}
-            </span>
-          </li>
-        </ul>
-        <a
-          href={directionsUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex h-11 items-center gap-2 self-start rounded-control border-2 border-brand bg-surface px-4 font-heading text-label font-bold"
-        >
-          <Navigation aria-hidden size={18} />
-          Directions
-          <span className="sr-only">(opens in a new tab)</span>
-        </a>
+            {hall.todayHours && (
+              <li className="flex items-center gap-1.5">
+                <Clock aria-hidden size={16} /> Today {formatHours(hall.todayHours)}
+              </li>
+            )}
+            <li className="flex items-start gap-1.5">
+              <MapPin aria-hidden size={16} className="mt-0.5 shrink-0" />
+              <span>
+                {hall.location}
+                {hall.address && <span className="block text-sm text-ink-3">{hall.address}</span>}
+              </span>
+            </li>
+          </ul>
+          <a
+            href={directionsUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-11 items-center gap-2 self-start rounded-control border-2 border-brand bg-surface px-4 font-heading text-label font-bold"
+          >
+            <Navigation aria-hidden size={18} />
+            Directions
+            <span className="sr-only">(opens in a new tab)</span>
+          </a>
+        </div>
+        <aside className="flex min-h-40 items-center justify-center rounded-card border border-line bg-surface-muted p-6 md:min-h-full">
+          <HallBrandMark hall={hall} size="hero" />
+        </aside>
       </section>
 
       {hall.mealPeriods.length > 1 && (
@@ -152,74 +156,78 @@ function HallMenu({ hall }: { hall: DiningHall }) {
 
       {menuQuery.data && (
         <>
-          <FreshnessNote updatedAt={menuQuery.data.updatedAt} />
-
-          <ChipRow label="Menu filters">
-            {profile && (
-              <Chip
-                active={safeOnly}
-                icon={<ShieldCheck aria-hidden size={16} />}
-                onClick={() => {
-                  setSafeOnly((v) => !v);
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <FilterMenu
+                activeCount={filters.size + Number(Boolean(profile && safeOnly))}
+                onReset={() => {
+                  setFilters(new Set());
+                  setSafeOnly(false);
                   setShowHidden(false);
                 }}
               >
-                Safe for Me
-              </Chip>
-            )}
-            {QUICK_FILTERS.map((f) => (
-              <Chip
-                key={f.value}
-                active={filters.has(f.value)}
-                onClick={() => setFilters((current) => toggleInSet(current, f.value))}
-              >
-                {f.label}
-              </Chip>
-            ))}
-          </ChipRow>
-
-          {/* Always say how many items are hidden and why (README requirement). */}
-          {profile && safeOnly && (hiddenCount > 0 || showHidden) && (
-            <div className="flex items-center gap-2.5 rounded-control border border-line bg-surface px-3.5 py-2.5 text-sm">
-              <EyeOff aria-hidden size={18} className="shrink-0 text-ink-3" />
-              <span className="flex-1" aria-live="polite">
-                {showHidden ? (
-                  <>Showing all {total} items, including ones that don't match your profile.</>
-                ) : (
-                  <>
-                    Showing {visible.length} of {total} · <b>{hiddenCount} hidden</b> because they
-                    contain your allergens or don't match your preferences
-                  </>
+                {profile && (
+                  <FilterGroup legend="Safety">
+                    <FilterOption
+                      type="checkbox"
+                      checked={safeOnly}
+                      onChange={() => {
+                        setSafeOnly((value) => !value);
+                        setShowHidden(false);
+                      }}
+                    >
+                      Safe for me
+                    </FilterOption>
+                  </FilterGroup>
                 )}
-              </span>
-              <button
-                type="button"
-                onClick={() => setShowHidden((v) => !v)}
-                className="min-h-11 px-2 font-bold text-brand"
-              >
-                {showHidden ? 'Hide' : 'Show'}
-              </button>
-            </div>
-          )}
+                <FilterGroup legend="Menu preferences">
+                  {QUICK_FILTERS.map((filter) => (
+                    <FilterOption
+                      key={filter.value}
+                      type="checkbox"
+                      checked={filters.has(filter.value)}
+                      onChange={() => setFilters((current) => toggleInSet(current, filter.value))}
+                    >
+                      {filter.label}
+                    </FilterOption>
+                  ))}
+                </FilterGroup>
+              </FilterMenu>
 
-          {sections.length > 1 && (
-            <nav
-              aria-label="Menu sections"
-              className="-mx-4 no-scrollbar flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0"
-            >
-              {sections.map(({ category }) => (
-                <a
-                  key={category}
-                  href={`#${categoryAnchor(category)}`}
-                  className="inline-flex h-11 shrink-0 items-center rounded-full border-[1.5px] border-line-strong bg-surface px-3.5 text-sm font-bold text-ink hover:bg-canvas hover:text-ink"
+              {profile && safeOnly && (hiddenCount > 0 || showHidden) && (
+                <button
+                  type="button"
+                  onClick={() => setShowHidden((value) => !value)}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-control border border-line bg-surface px-3 text-sm text-ink-2 hover:border-line-strong"
+                  aria-label={
+                    showHidden
+                      ? `Showing all ${total} items, including ${hiddenCount} that do not match your profile`
+                      : `${hiddenCount} items hidden because they do not match your profile or have unreported allergen data`
+                  }
                 >
-                  {category}
-                </a>
-              ))}
-            </nav>
-          )}
+                  <EyeOff aria-hidden size={17} className="text-ink-3" />
+                  <span>
+                    {showHidden ? (
+                      <>Showing all {total}</>
+                    ) : (
+                      <>
+                        <b>{hiddenCount} hidden</b> by your profile
+                      </>
+                    )}
+                  </span>
+                  <span className="font-bold text-brand">{showHidden ? 'Hide' : 'Show all'}</span>
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm text-ink-3">
+              <FreshnessNote updatedAt={menuQuery.data.updatedAt} variant="inline" />
+              <span aria-live="polite">
+                {visible.length} item{visible.length === 1 ? '' : 's'}
+              </span>
+            </div>
+          </div>
 
-          {sections.length === 0 ? (
+          {visible.length === 0 ? (
             <EmptyState title="No matching items">
               {total === 0
                 ? `${hall.name} hasn't posted a ${MEAL_PERIOD_LABELS[mealPeriod].toLowerCase()} menu.`
@@ -227,12 +235,7 @@ function HallMenu({ hall }: { hall: DiningHall }) {
             </EmptyState>
           ) : (
             sections.map(({ category, entries }, index) => (
-              <details
-                key={category}
-                id={categoryAnchor(category)}
-                open={index < EXPANDED_SECTIONS}
-                className="group scroll-mt-20 md:scroll-mt-36"
-              >
+              <details key={category} open={index < EXPANDED_SECTIONS} className="group">
                 <summary className="flex min-h-11 list-none items-center justify-between gap-2 [&::-webkit-details-marker]:hidden">
                   <h3 className="text-lg">{category}</h3>
                   <span className="flex items-center gap-1 text-sm text-ink-3">
@@ -261,6 +264,32 @@ function HallMenu({ hall }: { hall: DiningHall }) {
                 </div>
               </details>
             ))
+          )}
+
+          {extraEntries.length > 0 && (
+            <details className="group">
+              <summary className="flex min-h-11 list-none items-center justify-between gap-2 [&::-webkit-details-marker]:hidden">
+                <div>
+                  <h3 className="text-lg">Extras & sauces</h3>
+                  <p className="m-0 text-sm text-ink-3">
+                    Toppings, condiments, and salad-bar ingredients
+                  </p>
+                </div>
+                <span className="flex items-center gap-1 text-sm text-ink-3">
+                  {extraEntries.length} item{extraEntries.length === 1 ? '' : 's'}
+                  <ChevronDown
+                    aria-hidden
+                    size={18}
+                    className="transition-transform group-open:rotate-180"
+                  />
+                </span>
+              </summary>
+              <Card className="mt-2 overflow-hidden">
+                {extraEntries.map(({ item, assessment }) => (
+                  <MenuItemRow key={item.id} item={item} assessment={assessment} />
+                ))}
+              </Card>
+            </details>
           )}
         </>
       )}
