@@ -5,7 +5,7 @@ How SafeBite keeps students' dietary data private, what has been checked, and wh
 ## The approach
 
 - **The database enforces access, not the app.** The browser talks to Supabase with the publishable key, which is public by design. Row level security and trimmed table privileges limit every student to their own rows and let guests only send anonymous reports. Details: [rls.md](rls.md).
-- **Passwords and sessions are Supabase Auth's job.** SafeBite never stores or sees passwords. Sessions are signed tokens that Supabase issues and refreshes. Details: [authentication.md](authentication.md).
+- **Email codes and sessions are Supabase Auth's job.** SafeBite never stores or sees passwords. Sessions are signed tokens that Supabase issues and refreshes. Details: [authentication.md](authentication.md).
 - **The secret key stays out of the app.** The secret key (or legacy `service_role` key) bypasses RLS. It belongs only in trusted server-side code like the future scraper, never in the web app or in git.
 - **Only what's needed is stored:** an email, a name, the dietary profile, favorites and reports.
 
@@ -35,9 +35,8 @@ Re-run `rls_check.sql` and the Security Advisor after every schema change.
 
 These are Auth settings, set in the Supabase dashboard rather than in the database (see [supabase-setup.md](supabase-setup.md), step 2):
 
-- [ ] **Confirm email** is on, so nobody can create accounts under someone else's address.
-- [ ] **Minimum password length** is 8 (Supabase's default is 6).
-- [ ] **Site URL** and **Redirect URLs** list only SafeBite's own addresses, so confirmation links can't send students to another site.
+- [ ] **Email OTP** is enabled and its expiry remains short; the email template uses `{{ .Token }}` rather than a password or confirmation link.
+- [ ] **Site URL** and **Redirect URLs** list only SafeBite's own addresses, so optional magic links can't send students to another site.
 
 ## Known limits
 

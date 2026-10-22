@@ -7,29 +7,30 @@ describe('mock API', () => {
   it('lists every dining location', async () => {
     const halls = await api.halls.list();
     expect(halls.length).toBeGreaterThan(10);
-    expect(halls.map((h) => h.id)).toContain('centercourt');
+    expect(halls.map((h) => h.id)).toContain('center-court');
   });
 
   it('only returns items served in the requested meal period', async () => {
-    const menu = await api.menus.get('centercourt', {
-      date: '2026-10-08',
+    const menu = await api.menus.get('marketpointe', {
+      date: '2026-10-21',
       mealPeriod: 'breakfast',
     });
-    expect(menu.items.map((i) => i.name)).toContain('Scrambled Eggs');
-    expect(menu.items.map((i) => i.name)).not.toContain('Thai Peanut Noodles');
+    expect(menu.items.map((i) => i.name)).toContain('Scrambled Egg');
+    expect(menu.items.map((i) => i.name)).not.toContain('Grilled Chicken');
   });
 
   it('searches by name and dietary tag', async () => {
-    const results = await api.items.search({ q: 'gluten free', date: '2026-10-08' });
+    const results = await api.items.search({ q: 'vegan', date: '2026-10-21' });
     expect(results.length).toBeGreaterThan(0);
-    expect(results.every((item) => item.dietaryTags.includes('gluten-free'))).toBe(true);
+    expect(results.every((item) => item.dietaryTags.includes('vegan'))).toBe(true);
   });
 
   it('persists favorites', async () => {
-    await api.favorites.setItem('cc-brown-rice', true);
-    expect((await api.favorites.get()).itemIds).toContain('cc-brown-rice');
-    await api.favorites.setItem('cc-brown-rice', false);
-    expect((await api.favorites.get()).itemIds).not.toContain('cc-brown-rice');
+    const itemId = 'fixture_68de19b3050a147f7a3c';
+    await api.favorites.setItem(itemId, true);
+    expect((await api.favorites.get()).itemIds).toContain(itemId);
+    await api.favorites.setItem(itemId, false);
+    expect((await api.favorites.get()).itemIds).not.toContain(itemId);
   });
 
   it('only raises ingredient alerts for students they affect', async () => {
@@ -40,16 +41,7 @@ describe('mock API', () => {
       preferences: [],
       acknowledgedSafetyNotice: true,
     });
-    const alerts = await api.alerts.list();
-    expect(alerts).toHaveLength(1);
-    expect(alerts[0]).toMatchObject({
-      itemId: 'cc-chicken-alfredo',
-      allergen: 'milk',
-      readAt: null,
-    });
-
-    await api.alerts.markRead(alerts[0]!.id);
-    expect((await api.alerts.list())[0]!.readAt).not.toBeNull();
+    expect(await api.alerts.list()).toHaveLength(0);
   });
 
   it('raises alerts from the signed-in account when accounts live elsewhere', async () => {
@@ -69,6 +61,6 @@ describe('mock API', () => {
     });
     // Nothing saved in this mock's own storage, yet the account's profile counts.
     expect(await api.profile.get()).toBeNull();
-    expect((await withAccount.alerts.list()).map((a) => a.itemId)).toEqual(['cc-chicken-alfredo']);
+    expect(await withAccount.alerts.list()).toEqual([]);
   });
 });

@@ -44,9 +44,9 @@ Incorrect-information reports for the SafeBite team to review (in the dashboard'
 | `allow_contact` | `boolean`     | The team may email the student (look up the email from `user_id`)                                      |
 | `created_at`    | `timestamptz` |                                                                                                        |
 
-### Not in the database yet
+### Dining data and safety alerts
 
-Dining halls, menus, menu items and safety alerts. The scraper will own those tables. Until then, `item_id`, `target_id` and hall ids are plain text matching the ids in `web/src/api/mock/fixtures.ts`; add foreign keys once the dining tables exist.
+`dining_locations`, `menu_snapshots`, `menu_items`, `menu_item_changes` and `safety_alerts` are created by the `dining_data_pipeline` migration. Dining snapshots are append-only, source provenance is retained, and only the server-side importer can write them. Students may read public dining data and only their own safety alerts. The full seed-import and live-collector contract is in [dining-data-import.md](dining-data-import.md).
 
 ## Who can access what
 

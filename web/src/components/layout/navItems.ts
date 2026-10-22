@@ -1,4 +1,4 @@
-import { Heart, House, Search, User, Utensils, type LucideIcon } from 'lucide-react';
+import { Heart, MapPin, User, Utensils, type LucideIcon } from 'lucide-react';
 
 export interface NavItem {
   to: string;
@@ -7,13 +7,12 @@ export interface NavItem {
 }
 
 /**
- * Main tabs. "Orders" from the wireframe was replaced with Search, since
- * pre-ordering is out of scope for v1.
+ * Primary destinations, organized by the questions students actually bring
+ * to campus dining. Search is a Food flow, not its own competing destination.
  */
 export const NAV_ITEMS: NavItem[] = [
-  { to: '/', label: 'Home', icon: House },
-  { to: '/dining', label: 'Dining', icon: Utensils },
-  { to: '/search', label: 'Search', icon: Search },
-  { to: '/favorites', label: 'Favorites', icon: Heart },
-  { to: '/profile', label: 'Profile', icon: User },
+  { to: '/', label: 'Food', icon: Utensils },
+  { to: '/dining', label: 'Places', icon: MapPin },
+  { to: '/favorites', label: 'Saved', icon: Heart },
+  { to: '/profile', label: 'You', icon: User },
 ];

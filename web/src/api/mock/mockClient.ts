@@ -1,7 +1,7 @@
 /**
  * In-browser implementation of SafeBiteApi used until the backend exists.
  *
- * Reads come from fixtures.ts; anything a student changes (profile,
+ * Reads come from a generated UC Dining fixture; anything a student changes (profile,
  * favorites, alerts read, reports) is kept in localStorage so it survives a
  * reload. A small artificial delay keeps loading states honest during
  * development.
@@ -16,7 +16,7 @@ import type {
   SafetyAlert,
   Session,
 } from '../schemas';
-import { HALLS, ITEM_FIXTURES, STALE_HALL_IDS } from './fixtures';
+import { HALLS, ITEM_FIXTURES, MENU_FIXTURES } from './realFixtures';
 
 const LATENCY_MS = 250;
 
@@ -49,43 +49,43 @@ function write(key: string, value: unknown) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-const hoursAgo = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString();
-
-/** Fixtures → API items, with timestamps generated relative to now. */
-function toMenuItem({
-  periods: _periods,
-  changedToday,
-  ...fixture
-}: (typeof ITEM_FIXTURES)[number]): MenuItem {
-  const stale = STALE_HALL_IDS.has(fixture.hallId);
-  return {
-    ...fixture,
-    updatedAt: stale ? hoursAgo(72) : hoursAgo(2),
-    ...(changedToday && { ingredientsChangedAt: hoursAgo(1) }),
-  };
-}
-
 function findItem(itemId: string): MenuItem {
   const fixture = ITEM_FIXTURES.find((item) => item.id === itemId);
   if (!fixture) throw new ApiError('Menu item not found', 404);
-  return toMenuItem(fixture);
+  return fixture;
 }
 
 function buildMenu(hallId: string, date: string, mealPeriod: Menu['mealPeriod']): Menu {
-  return {
-    hallId,
-    date,
-    mealPeriod,
-    updatedAt: STALE_HALL_IDS.has(hallId) ? hoursAgo(72) : hoursAgo(2),
-    items: ITEM_FIXTURES.filter(
-      (item) => item.hallId === hallId && item.periods.includes(mealPeriod),
-    ).map(toMenuItem),
-  };
+  return (
+    MENU_FIXTURES.find(
+      (menu) => menu.hallId === hallId && menu.date === date && menu.mealPeriod === mealPeriod,
+    ) ?? {
+      hallId,
+      date,
+      mealPeriod,
+      updatedAt: new Date(`${date}T00:00:00.000Z`).toISOString(),
+      items: [],
+    }
+  );
 }
 
 /** Case-insensitive match against name, station, category and dietary tags. */
 function matchesQuery(item: MenuItem, q: string): boolean {
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const dietaryTagQuery = terms.join('-');
+  if (
+    [
+      'vegetarian',
+      'vegan',
+      'gluten-free',
+      'dairy-free',
+      'halal',
+      'kosher',
+      'high-protein',
+    ].includes(dietaryTagQuery)
+  ) {
+    return item.dietaryTags.includes(dietaryTagQuery as (typeof item.dietaryTags)[number]);
+  }
   const haystack = [
     item.name,
     item.station,
@@ -112,30 +112,11 @@ function toggle(list: string[], id: string, on: boolean): string[] {
 }
 
 /**
- * Mimics the backend's alert job: when a scrape adds an allergen to an item,
- * alert students who avoid that allergen or have the item saved.
+ * Historical seed data has no change history, so it intentionally produces no
+ * alerts. The backend can replace this with its scrape-diff job later.
  */
-function computeAlerts(profile: DietaryProfile | null, favorites: Favorites): SafetyAlert[] {
-  const readIds = read<Record<string, string>>(KEYS.readAlerts, {});
-
-  return ITEM_FIXTURES.filter((item) => item.changedToday && item.allergens).flatMap((item) => {
-    // In the fixtures, the first "contains" allergen is the one that was added.
-    const added = item.allergens!.contains[0];
-    if (!added) return [];
-    const avoids = profile?.avoid.some((a) => a.allergen === added) ?? false;
-    if (!avoids && !favorites.itemIds.includes(item.id)) return [];
-    const id = `alert-${item.id}`;
-    return [
-      {
-        id,
-        itemId: item.id,
-        hallId: item.hallId,
-        allergen: added,
-        createdAt: hoursAgo(1),
-        readAt: readIds[id] ?? null,
-      },
-    ];
-  });
+function computeAlerts(_profile: DietaryProfile | null, _favorites: Favorites): SafetyAlert[] {
+  return [];
 }
 
 // ---------------------------------------------------------------------------
@@ -214,16 +195,15 @@ export function createMockClient({ account }: MockClientOptions = {}): SafeBiteA
 
     items: {
       get: async (itemId) => delay(findItem(itemId)),
-      getMany: async (itemIds) =>
-        delay(ITEM_FIXTURES.filter((item) => itemIds.includes(item.id)).map(toMenuItem)),
-      async search({ q, mealPeriod, hallId }) {
-        const results = ITEM_FIXTURES.filter(
-          (item) =>
-            item.periods.length > 0 &&
-            (!mealPeriod || item.periods.includes(mealPeriod)) &&
-            (!hallId || item.hallId === hallId),
+      getMany: async (itemIds) => delay(ITEM_FIXTURES.filter((item) => itemIds.includes(item.id))),
+      async search({ q, date, mealPeriod, hallId }) {
+        const results = MENU_FIXTURES.filter(
+          (menu) =>
+            menu.date === date &&
+            (!mealPeriod || menu.mealPeriod === mealPeriod) &&
+            (!hallId || menu.hallId === hallId),
         )
-          .map(toMenuItem)
+          .flatMap((menu) => menu.items)
           .filter((item) => matchesQuery(item, q));
         return delay(results);
       },

@@ -47,7 +47,7 @@ export function ProfilePage() {
 
   return (
     <>
-      <PageIntro className="flex-row items-center gap-4">
+      <PageIntro width="wide" className="flex-row items-center gap-4">
         <div
           aria-hidden
           className="flex size-16 shrink-0 items-center justify-center rounded-full bg-brand font-heading text-xl font-extrabold text-on-brand"
@@ -62,7 +62,7 @@ export function ProfilePage() {
         </div>
       </PageIntro>
 
-      <Page>
+      <Page width="wide">
         <DietaryProfileSection />
 
         <SettingsSection title="Account">

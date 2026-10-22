@@ -1,10 +1,11 @@
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Sparkles } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import type { MenuItem } from '@/api/schemas';
 import { DietaryBadge } from '@/components/ui/DietaryBadge';
 import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
 import { FavoriteButton } from '@/features/favorites/FavoriteButton';
+import { getBalancedChoice } from '@/features/nutrition/balancedChoice';
 import { AllergenLine } from '@/features/safety/AllergenLine';
 import type { SafetyAssessment } from '@/features/safety/assess';
 import { SafetyBadge } from '@/features/safety/SafetyBadge';
@@ -35,6 +36,7 @@ export function MenuItemCard({
 }: MenuItemCardProps) {
   const style = STATUS_STYLES[assessment.status];
   const StatusIcon = style.icon;
+  const isNutritionPick = getBalancedChoice(item.nutrition)?.tone === 'strong';
   const meta = [hallName, item.station, `${item.nutrition.calories} cal`]
     .filter(Boolean)
     .join(' · ');
@@ -52,7 +54,18 @@ export function MenuItemCard({
       )}
 
       <div className="flex gap-3 py-3 pr-2 pl-3.5">
-        <ImagePlaceholder className="size-14" />
+        <div className="relative shrink-0">
+          <ImagePlaceholder className="size-14" />
+          {isNutritionPick && (
+            <span
+              className="absolute -top-1.5 -left-1.5 flex size-6 items-center justify-center rounded-full border-2 border-surface bg-safe text-on-brand shadow-sm"
+              aria-label="Nutrition pick: more nutrient-forward based on the listed serving"
+              title="Nutrition pick"
+            >
+              <Sparkles aria-hidden size={13} strokeWidth={3} />
+            </span>
+          )}
+        </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           {/* Stretched link: the whole card is clickable, the heart stays separate. */}
           <Link

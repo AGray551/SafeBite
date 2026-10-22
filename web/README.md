@@ -40,7 +40,7 @@ CI (`.github/workflows/web.yml`) runs lint, format check, typecheck, tests and b
 | Styling                   | **Tailwind CSS v4**                | Design tokens from the wireframes live in one CSS file as variables.                                                                                |
 | Icons                     | **lucide-react**                   | Consistent, tree-shakeable icon set.                                                                                                                |
 | Map                       | **Leaflet + react-leaflet**        | Free OpenStreetMap tiles, no API key needed.                                                                                                        |
-| Accounts                  | **Supabase** (`supabase-js`)       | Hosted Postgres + email/password auth with a free tier; row level security keeps each student's data private without writing our own auth server.   |
+| Accounts                  | **Supabase** (`supabase-js`)       | Hosted email-code auth and signed sessions; row level security protects student data without custom passwords.                                      |
 | Tests                     | **Vitest + Testing Library**       | Same config as Vite, fast, and tests behaviour the way users see it.                                                                                |
 
 ## Project structure
@@ -77,7 +77,7 @@ Conventions:
 2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from the Supabase dashboard (**Project Settings → API Keys**).
 3. Restart `npm run dev`.
 
-Sign-in, sign-up, sign-out, and each signed-in student's dietary profile, favorites and reports then go to Supabase (`api/supabase/supabaseClient.ts`). Guests still keep their profile and favorites on the device. Halls, menus, items and alerts keep coming from the mock or the REST API. Teammates: follow [docs/local-setup.md](../docs/local-setup.md). One-time project setup (schema, auth settings) is in [docs/supabase-setup.md](../docs/supabase-setup.md).
+Supabase handles email-code sign-in, sign-out, session refresh, and the JWT sent to the backend. Student data, halls, menus, items, and alerts use the mock API until `VITE_API_BASE_URL` is configured. Guests keep their profile and favorites on the device. Teammates: follow [docs/local-setup.md](../docs/local-setup.md). One-time project setup (schema, auth settings) is in [docs/supabase-setup.md](../docs/supabase-setup.md).
 
 If the project requires email confirmation, sign-up shows "Check your email" and the link in the email opens `/auth/callback`, which signs the student in.
 
@@ -95,9 +95,6 @@ All responses are JSON and must match the schemas in `src/api/schemas.ts`. Authe
 
 | Method             | Path                                         | Returns                                           |
 | ------------------ | -------------------------------------------- | ------------------------------------------------- |
-| POST               | `/auth/sign-in`                              | `Session` (body: `email`, `password`)             |
-| POST               | `/auth/sign-up`                              | `Session` (body: `name`, `email`, `password`)     |
-| POST               | `/auth/sign-out`                             | 204                                               |
 | GET                | `/halls`                                     | `DiningHall[]`                                    |
 | GET                | `/halls/:hallId`                             | `DiningHall`                                      |
 | GET                | `/menus?date=YYYY-MM-DD&mealPeriod=lunch`    | `Menu[]` (one per location)                       |
@@ -138,3 +135,11 @@ Status is always shown with an icon, a word **and** a border style (solid, dashe
 - **Password reset** isn't wired up yet. Supabase supports it (`resetPasswordForEmail`); it needs a "set a new password" screen.
 - **Notification toggles** are saved per device; delivering notifications needs the backend.
 - Out of scope for v1 (per the project README): the staff admin dashboard, crowd levels / wait times, and pre-ordering.
+
+## UC Dining mock data
+
+The frontend’s default dining API uses the real UC Dining seed export in `../data/uc-dining/`. After updating that export, regenerate the browser fixture from the repository root:
+
+```sh
+node scripts/generate-mock-fixtures.mjs
+```
